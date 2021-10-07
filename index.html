@@ -13,5 +13,13 @@
     <div id = "square">    </div>
     <script src="app.js"></script>
     <noscript>Please enable javascript to use this app.</noscript>
+
+    <p>Import your .tmd5 (treemaker) file here</p>
+    <input type="file" id="inputfile" name = "inputfile">
+    <pre id="output"></pre>
+    <script>
+        fileRead();
+    </script>
+    <button type = button onclick="extract()">Upload</button>    
 </body>
 </html>
