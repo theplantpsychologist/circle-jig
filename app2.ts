@@ -1,6 +1,7 @@
 //'use strict'
 //const canvas = document.getElementById("mainCanvas");
 //const ctx = canvas.getContext("2d"); //what about 3d? 
+//comment change
 var mousex
 var mousey
 window.addEventListener('mousemove', function(e) {
