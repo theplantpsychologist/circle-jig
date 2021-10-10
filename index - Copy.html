@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle Jig</title>
+    <!---<link rel="stylesheet" href="main.css">--->
+</head>
+<body>
+    <h2>Circle Jig</h2>
+    <p>Instructions</p>
+    <div id = "square">    </div>
+    <script src="app2.js"></script>
+    <noscript>Please enable javascript to use this app.</noscript>
+
+    <p>Import your .tmd5 (treemaker) file here</p>
+    <input type="file" id="inputfile" name = "inputfile">
+    <pre id="output"></pre>
+    <script>
+        fileRead();
+    </script>
+    <button type = button onclick="extract()">Upload</button>    
+</body>
+</html>
