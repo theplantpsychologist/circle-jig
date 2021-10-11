@@ -1,6 +1,7 @@
 //'use strict'
 //const canvas = document.getElementById("mainCanvas");
 //const ctx = canvas.getContext("2d"); //what about 3d? 
+//comment change
 var mousex;
 var mousey;
 window.addEventListener('mousemove', function (e) {
@@ -39,7 +40,7 @@ var Disk = /** @class */ (function () {
         this.index = edge.index;
         this.label = edge.label;
         this.x = edge.x1 * square.canvas.width; //even if length is different, everybody scale the same
-        this.y = edge.y1 * square.canvas.width;
+        this.y = edge.y1 * square.canvas.width * -1 + square.canvas.height;
         this.r = edge.r * square.canvas.width;
         //flaps.push(this)
         this.color = "#C5FBA8"; //a light green
@@ -50,12 +51,20 @@ var Disk = /** @class */ (function () {
         square.ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
         square.ctx.fill();
         square.ctx.stroke();
-        square.ctx.beginPath();
+        square.ctx.beginPath(); //the central circle
         square.ctx.arc(this.x, this.y, 2, 0, 2 * Math.PI);
         square.ctx.stroke();
+        square.ctx.font = "30px Arial";
+        square.ctx.fillText(this.label, this.x + 5, this.y - 5);
     };
     return Disk;
 }()); //how to display a disk
+var River = /** @class */ (function () {
+    function River(edge) {
+        this.r = edge.r * square.canvas.width;
+    }
+    return River;
+}());
 var tmd5;
 var scale;
 var flaps;
@@ -85,7 +94,9 @@ function extract() {
     edges = ['buffer']; //buffer because treemaker starts at 1, instead of 0
     collectNodes(tmd5);
     collectEdges(tmd5);
-    collectFlaps(edges);
+    collectFlaps(tmd5);
+    //buildTree(nodes,edges);
+    findChildren(nodes[7]); //this needs to not be a leaf
 }
 //initializes by storing stuff into lists
 var TreeNode = /** @class */ (function () {
@@ -95,6 +106,7 @@ var TreeNode = /** @class */ (function () {
         this.x = x;
         this.y = y;
         this.leaf = leaf;
+        this.children = [];
     }
     return TreeNode;
 }());
@@ -108,6 +120,7 @@ var Edge = /** @class */ (function () {
         this.y2 = node2.y;
         this.node1 = node1;
         this.label = node1.label;
+        this.node1.r = this.r; /////////////this could be sus...?
         this.node2 = node2;
         if (node1.leaf) {
             this.flap = true;
@@ -152,10 +165,40 @@ function collectEdges(tmd5) {
         }
     }
 }
+//function buildTree(nodes,edges) {
+function findChildren(current_node) {
+    if (current_node.leaf) {
+        return;
+    }
+    for (var i = 1; i < edges.length; i++) {
+        if (edges[i].node1 == current_node && edges[i].node2.children.length == 0) {
+            //if another edge comes out of this node, but hasn't already been assigned (ie itself)
+            current_node.children.push(edges[i].node2);
+            edges[i].node2.parent = current_node;
+            //console.log(edges[i].node2.index,"is child of",current_node.index)
+            if (!edges[i].node2.leaf) {
+                findChildren(edges[i].node2);
+            }
+        }
+        if (edges[i].node2 == current_node && edges[i].node1.children.length == 0) {
+            current_node.children.push(edges[i].node1);
+            edges[i].node1.parent = current_node;
+            //console.log(edges[i].node1.index,"is child of",current_node.index)
+            if (!edges[i].node1.leaf) {
+                findChildren(edges[i].node1);
+            }
+        }
+    }
+}
+//findChildren(nodes[1]);
+//}
 function collectFlaps(tmd5) {
     for (var i = 1; i < edges.length; i++) {
         if (edges[i].flap) {
             flaps.push(new Disk(edges[i]));
+        }
+        else {
+            rivers.push(new River(edges[i]));
         }
     }
 }
