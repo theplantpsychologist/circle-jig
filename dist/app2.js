@@ -207,7 +207,7 @@ function findAnscestors(original_node, current_node) {
         findAnscestors(original_node, current_node.parent);
     }
 }
-function findDistance(node1, node2) {
+function findTreeDistance(node1, node2) {
     var distance = 0;
     for (var i = 0; i < node1.ancestry.length; i++) { //look through node1's ancestors
         if (node2.ancestry.includes(node1.ancestry[i])) {

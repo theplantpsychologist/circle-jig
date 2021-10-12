@@ -116,9 +116,13 @@ function extract() {
 	collectEdges(tmd5);
 	collectFlaps(tmd5);
 	//buildTree(nodes,edges);
-	findChildren(nodes[7]); //this needs to not be a leaf
+	findChildren(nodes[1]); //node 1 is the root node
+	for(var i=1;i<nodes.length;i++){
+		findAnscestors(nodes[i],nodes[i]);
+	}
 }
 //initializes by storing stuff into lists
+//by the end of this, all the nodes should have their parents 
 
 class TreeNode {
 	index: number;
@@ -129,6 +133,7 @@ class TreeNode {
 	r: number;    //initialized once an edge is assigned to it
 	children: Array<TreeNode>;
 	parent: TreeNode; //assigned when buildTree builds the tree
+	ancestry: Array<TreeNode>;
 	constructor(index, label, x, y, leaf) {
 		this.index = index
 		this.label = label
@@ -136,6 +141,7 @@ class TreeNode {
 		this.y = y
 		this.leaf = leaf
 		this.children = []
+		this.ancestry = [] //used for finding distances between flaps
 	}
 }
 class Edge {
@@ -165,7 +171,7 @@ class Edge {
 		} else { this.flap = false }
 	}
 }
-function collectNodes(tmd5) {
+function collectNodes(tmd5): void {
 	for(var i = 0; i < tmd5.length; i++) {
 		if(tmd5[i] == "node") {
 			var index = parseInt(tmd5[i + 1])
@@ -179,7 +185,7 @@ function collectNodes(tmd5) {
 		}
 	}
 }
-function collectEdges(tmd5) {
+function collectEdges(tmd5): void {
 	for(var i = 0; i < tmd5.length; i++) {
 		if(tmd5[i] == 'edge') {
 			var index = tmd5[i + 1]
@@ -196,8 +202,8 @@ function collectEdges(tmd5) {
 	}
 }
 //function buildTree(nodes,edges) {
-function findChildren(current_node) {
-	if (current_node.leaf){
+function findChildren(current_node: TreeNode) {
+	if (current_node.leaf && current_node.index!=1){ //in case node[1], the root, is a leaf
 		return
 	}
 	for (var i=1; i<edges.length; i++){
@@ -205,6 +211,7 @@ function findChildren(current_node) {
 			//if another edge comes out of this node, but hasn't already been assigned (ie itself)
 			current_node.children.push(edges[i].node2);
 			edges[i].node2.parent = current_node;
+			edges[i].node2.r = edges[i].r;
 			//console.log(edges[i].node2.index,"is child of",current_node.index)
 			if(!edges[i].node2.leaf){
 				findChildren(edges[i].node2)
@@ -213,6 +220,7 @@ function findChildren(current_node) {
 		if (edges[i].node2==current_node&&edges[i].node1.children.length==0){
 			current_node.children.push(edges[i].node1);
 			edges[i].node1.parent = current_node;
+			edges[i].node1.r = edges[i].r;
 			//console.log(edges[i].node1.index,"is child of",current_node.index)
 			if(!edges[i].node1.leaf){
 				findChildren(edges[i].node1)
@@ -220,9 +228,32 @@ function findChildren(current_node) {
 		}
 	}
 }
-	//findChildren(nodes[1]);
-//}
-function collectFlaps(tmd5) {
+function findAnscestors(original_node,current_node){
+	//console.log("original node",original_node.index,"current node",current_node.index)
+	original_node.ancestry.push(current_node);
+	if(current_node.parent==undefined){
+		return
+	} else{
+		findAnscestors(original_node,current_node.parent)
+	}
+}
+function findTreeDistance(node1: TreeNode,node2: TreeNode):number{
+	var distance = 0;
+	for(var i=0;i<node1.ancestry.length;i++){ //look through node1's ancestors
+		if (node2.ancestry.includes(node1.ancestry[i])){
+			//i is the index of the first common ancestor. add up from node1 and node 2 ancestry
+			for(var j=0;j<i;j++){
+				distance += node1.ancestry[j].r;
+			}
+			var index = node2.ancestry.indexOf(node1.ancestry[i]);
+			for(var k=0;k<index;k++){
+				distance += node2.ancestry[k].r;
+			}
+			return distance
+		}
+	}
+}
+function collectFlaps(tmd5): void {
 	for(var i = 1; i < edges.length; i++) {
 		if(edges[i].flap) {
 			flaps.push(new Disk(edges[i]));
@@ -230,4 +261,7 @@ function collectFlaps(tmd5) {
 			rivers.push(new River(edges[i]));
 		}
 	}
-}
+} //maybe just make the leaf nodes be the flaps directly? give them an update() method?
+
+
+//if something changes length, update all paths
