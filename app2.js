@@ -54,8 +54,9 @@ var Disk = /** @class */ (function () {
         square.ctx.beginPath(); //the central circle
         square.ctx.arc(this.x, this.y, 2, 0, 2 * Math.PI);
         square.ctx.stroke();
-        square.ctx.font = "30px Arial";
-        square.ctx.fillText(this.label, this.x + 5, this.y - 5);
+        square.ctx.fillStyle = "black";
+        square.ctx.font = "15px Arial";
+        square.ctx.fillText(this.label, this.x + 5, this.y + 5);
     };
     return Disk;
 }()); //how to display a disk
@@ -207,7 +208,7 @@ function findAnscestors(original_node, current_node) {
         findAnscestors(original_node, current_node.parent);
     }
 }
-function findDistance(node1, node2) {
+function findTreeDistance(node1, node2) {
     var distance = 0;
     for (var i = 0; i < node1.ancestry.length; i++) { //look through node1's ancestors
         if (node2.ancestry.includes(node1.ancestry[i])) {

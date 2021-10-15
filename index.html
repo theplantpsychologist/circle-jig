@@ -11,10 +11,43 @@
 <body>
     <h2>Circle Jig</h2>
     <p>Instructions</p>
-    <div id = "square">    </div>
+    <canvas id = "square" width = 600 height = 600>    </canvas>
+    <script src="paper-core.js"></script>
     <script src="app2.js"></script>
-    <noscript>Please enable javascript to use this app.</noscript>
+    <script type="text/javascript" data-paper-ignore = "true">
+        paper.setup(document.getElementById("square"))
+        circles = [];
+        flaps = [];
+        function drawBorder(){
+            border = new paper.Path.Rectangle(0,0,600,600);
+            border.strokeColor = 'black';
+            border.strokeWidth = 3;
+        }
+        drawBorder();
+        function drawCircles(){
+            for (var i=0;i<flaps.length;i++){
+                circle = new paper.Path.Circle(new paper.Point(flaps[i].x,flaps[i].y),flaps[i].r);
+                circle.strokeColor = "black";
+                circle.fillColor = flaps[i].color
+                circle.strokeWidth = 1;
+                circles.push(circle);
+            }
+        }
+        drawCircles();
+        //---------------main---------------
+        paper.view.onFrame = function(event){
+            for (var i=0; i<circles.length;i++){
+                circles[i].remove();
+            }
+            circles = [];
+            drawCircles();
+            border.remove()
+            drawBorder();
+        }
+        paper.view.draw();
 
+    </script>
+    <noscript>Please enable javascript to use this app.</noscript>
     <p>Import your .tmd5 (treemaker) file here</p>
     <input type="file" id="inputfile" name = "inputfile">
     <pre id="output"></pre>

@@ -72,8 +72,9 @@ class Disk {
 		square.ctx.arc(this.x, this.y, 2, 0, 2 * Math.PI);
 		square.ctx.stroke();
 		
-		square.ctx.font = "30px Arial";
-		square.ctx.fillText(this.label,this.x+5,this.y-5)
+		square.ctx.fillStyle = "black";
+		square.ctx.font = "15px Arial";
+		square.ctx.fillText(this.label,this.x+5,this.y+5)
 	} 
 } //how to display a disk
 class River {
