@@ -4,21 +4,22 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circle Jig</title>
+    <title>Tree Helper</title>
     <!---<link rel="stylesheet" href="main.css">--->
 
 </head>
 <body>
-    <h2>Circle Jig</h2>
+    <h2>Tree Helper</h2>
     <p>Instructions</p>
     <canvas id = "square" width = 500 height = 500>    </canvas>
     <script src="paper-core.js"></script>
     <script src="app2.js"></script>
     <script type="text/javascript" data-paper-ignore = "true">
         paper.setup(document.getElementById("square"))
-        circles = [];
-        flaps = [];
-        console.log("html",square.width/1.5);
+        circles = []; //the flaps drawn
+        lines = []; //the paths drawn
+        flaps = []; //an initial empty, once you extract from .tmd5, it will be replaced
+        paths = []
         function drawBorder(){
             border = new paper.Path.Rectangle(0,0,square.width/1.5,square.height/1.5);
             border.strokeColor = 'black';
@@ -33,32 +34,63 @@
                     ), 
                     flaps[i].r*square.width/1.5);
                 circle.strokeColor = "black";
-                circle.fillColor = flaps[i].color
+                circle.fillColor = "#C5FBA8"
                 circle.strokeWidth = 1;
                 circles.push(circle);
             }
         }
         drawCircles();
+        function drawPaths(){
+            for (var i=0;i<paths.length;i++){
+                if (paths[i].isActive){
+                    path = new paper.Path.Line();
+                    path.add(new paper.Point(
+                            paths[i].node1.x *square.width/1.5,
+                            paths[i].node1.y *square.width/1.5 *-1 + square.height/1.5))
+                    path.add(new paper.Point(
+                            paths[i].node2.x *square.width/1.5,
+                            paths[i].node2.y *square.width/1.5 *-1 + square.height/1.5));
+                    path.strokeColor = 'lime';
+                    lines.push(path);
+                } else if (paths[i].isInvalid){
+                    path = new paper.Path.Line()
+                        path.add(new paper.Point(
+                            paths[i].node1.x *square.width/1.5,
+                            paths[i].node1.y *square.width/1.5 *-1 + square.height/1.5))
+                    path.add(new paper.Point(
+                            paths[i].node2.x *square.width/1.5,
+                            paths[i].node2.y *square.width/1.5 *-1 + square.height/1.5));
+                    path.strokeColor = 'red';
+                    lines.push(path);
+                }
+            }
+        }
+        drawPaths();
+        
         //---------------main---------------
         paper.view.onFrame = function(event){
             for (var i=0; i<circles.length;i++){
                 circles[i].remove();
             }
             circles = [];
+            lines = [];
             drawCircles();
             border.remove()
             drawBorder();
+            drawPaths();
         }
         paper.view.draw();
 
     </script>
     <noscript>Please enable javascript to use this app.</noscript>
-    <p>Import your .tmd5 (treemaker) file here</p>
+    <p>Import your .tmd5 (treemaker) file here:</p>
     <input type="file" id="inputfile" name = "inputfile">
     <pre id="output"></pre>
     <script>
         fileRead();
     </script>
-    <button type = button onclick="extract()">Upload</button>    
+    <button type = button onclick="extract()">Upload</button>  
+    <p>This tool was created by Brandon Wong</p>
+    <a href="https://github.com/theplantpsychologist/circle-jig"> Github repository</a>  
 </body>
 </html>

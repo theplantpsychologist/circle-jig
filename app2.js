@@ -1,36 +1,9 @@
 //'use strict'
 var square = document.getElementById("square");
-var squareWidth = Number(square.style.width.slice(0, -2));
-var squareHeight = Number(square.style.height.slice(0, -2));
-console.log(squareWidth, squareHeight);
-var mousex;
-var mousey;
-window.addEventListener('mousemove', function (e) {
-    mousex = e.pageX;
-    mousey = e.pageY;
-});
-/*
-interface Square {
-    canvas: HTMLCanvasElement;
-    start: () => void;
-    clear: () => void;
-    ctx: CanvasRenderingContext2D;
-} */
-var Disk = /** @class */ (function () {
-    function Disk(edge) {
-        this.index = edge.index;
-        this.label = edge.label;
-        this.x = edge.x1; //even if length is different, everybody scale the same
-        this.y = edge.y1;
-        this.r = edge.r;
-        //flaps.push(this)
-        this.color = "#C5FBA8"; //a light green
-    }
-    return Disk;
-}());
+var ooga = "booga";
 var River = /** @class */ (function () {
     function River(edge) {
-        this.r = edge.r * squareWidth;
+        this.r = edge.r;
     }
     return River;
 }());
@@ -40,6 +13,7 @@ var flaps;
 var rivers;
 var nodes;
 var edges;
+var paths;
 function fileRead() {
     document.getElementById('inputfile')
         .addEventListener('change', function () {
@@ -61,6 +35,7 @@ function extract() {
     rivers = [];
     nodes = ['buffer']; //raw collected from treemaker
     edges = ['buffer']; //buffer because treemaker starts at 1, instead of 0
+    paths = [];
     collectNodes(tmd5);
     collectEdges(tmd5);
     collectFlaps(tmd5);
@@ -69,6 +44,7 @@ function extract() {
     for (var i = 1; i < nodes.length; i++) {
         findAnscestors(nodes[i], nodes[i]);
     }
+    collectPaths(flaps);
 }
 //initializes by storing stuff into lists
 //by the end of this, all the nodes should have their parents 
@@ -105,6 +81,28 @@ var Edge = /** @class */ (function () {
     }
     return Edge;
 }());
+//technically only leaf paths. Make sure distances update when nodes update
+var Path = /** @class */ (function () {
+    function Path(node1, node2) {
+        this.node1 = node1;
+        this.node2 = node2;
+        this.cpDistance = Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5);
+        if (Math.abs(findTreeDistance(node1, node2) - Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5)) < 0.0001) {
+            console.log(paths.length, "is active path");
+            this.isActive = true;
+            this.isInvalid = false;
+        }
+        else if (findTreeDistance(node1, node2) > Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5)) {
+            this.isInvalid = true;
+            this.isActive = false;
+        }
+        else {
+            this.isActive = false;
+            this.isInvalid = false;
+        }
+    }
+    return Path;
+}());
 function collectNodes(tmd5) {
     for (var i = 0; i < tmd5.length; i++) {
         if (tmd5[i] == "node") {
@@ -139,7 +137,6 @@ function collectEdges(tmd5) {
         }
     }
 }
-//function buildTree(nodes,edges) {
 function findChildren(current_node) {
     if (current_node.leaf && current_node.index != 1) { //in case node[1], the root, is a leaf
         return;
@@ -193,13 +190,17 @@ function findTreeDistance(node1, node2) {
     }
 }
 function collectFlaps(tmd5) {
-    for (var i = 1; i < edges.length; i++) {
-        if (edges[i].flap) {
-            flaps.push(new Disk(edges[i]));
-        }
-        else {
-            rivers.push(new River(edges[i]));
+    for (var i = 1; i < nodes.length; i++) {
+        if (nodes[i].leaf) {
+            flaps.push(nodes[i]);
         }
     }
-} //maybe just make the leaf nodes be the flaps directly? give them an update() method?
+}
+function collectPaths(flaps) {
+    for (var i = 0; i < flaps.length; i++) {
+        for (var j = i + 1; j < flaps.length; j++) {
+            paths.push(new Path(flaps[i], flaps[j]));
+        }
+    }
+}
 //if something changes length, update all paths
