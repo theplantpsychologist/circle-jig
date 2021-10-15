@@ -1,7 +1,7 @@
 //'use strict'
-//const canvas = document.getElementById("mainCanvas");
-//const ctx = canvas.getContext("2d"); //what about 3d? 
-//comment change
+const square = document.getElementById("square");
+var squareWidth = Number(square.style.width.slice(0,-2));
+var squareHeight = Number(square.style.height.slice(0,-2));
 var mousex
 var mousey
 window.addEventListener('mousemove', function(e) {
@@ -9,42 +9,15 @@ window.addEventListener('mousemove', function(e) {
 	mousey = e.pageY;
 })
  
+/*
 interface Square {
 	canvas: HTMLCanvasElement;
 	start: () => void;
 	clear: () => void;
 	ctx: CanvasRenderingContext2D;
-}
+} */
 
-var square: Square = {
-	canvas: document.createElement("canvas"),
-	start: function() {
-		this.canvas.width = 600;
-		this.canvas.height = 600;
-		this.ctx = this.canvas.getContext("2d");
-		document.getElementById('square').appendChild(this.canvas);
-		//this.ctx.fillStyle = "#C5FBA8";
-		this.interval = setInterval(update, 20);
-	},
-	clear: function() {
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	}
-} as Square;
-square.start();
-
-function update() {
-	square.clear();
-	for(var i in flaps) {
-		flaps[i].update();
-	}
-	square.ctx.strokeRect(0, 0, square.canvas.width, square.canvas.height);
-}
-function line(x1, y1, x2, y2) {
-	square.ctx.moveTo(x1, y1);
-	square.ctx.lineTo(x2, y2);
-	square.ctx.stroke();
-}
-
+//use the tree ancestries to find the disks, or just use the nodes
 class Disk {
 	index: number;
 	label: string;
@@ -55,32 +28,17 @@ class Disk {
 	constructor(edge) {
 		this.index = edge.index
 		this.label = edge.label
-		this.x = edge.x1 * square.canvas.width //even if length is different, everybody scale the same
-		this.y = edge.y1 * square.canvas.width *-1 + square.canvas.height
-		this.r = edge.r * square.canvas.width
+		this.x = edge.x1  //even if length is different, everybody scale the same
+		this.y = edge.y1
+		this.r = edge.r
 		//flaps.push(this)
 		this.color = "#C5FBA8" //a light green
 	}
-	update() { 
-		square.ctx.fillStyle = this.color;
-		square.ctx.beginPath();
-		square.ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
-		square.ctx.fill();
-		square.ctx.stroke();
-
-		square.ctx.beginPath(); //the central circle
-		square.ctx.arc(this.x, this.y, 2, 0, 2 * Math.PI);
-		square.ctx.stroke();
-		
-		square.ctx.fillStyle = "black";
-		square.ctx.font = "15px Arial";
-		square.ctx.fillText(this.label,this.x+5,this.y+5)
-	} 
-} //how to display a disk
+} 
 class River {
 	r: number;
 	constructor(edge){
-		this.r = edge.r *square.canvas.width
+		this.r = edge.r
 	}
 }
 

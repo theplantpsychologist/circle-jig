@@ -11,22 +11,27 @@
 <body>
     <h2>Circle Jig</h2>
     <p>Instructions</p>
-    <canvas id = "square" width = 600 height = 600>    </canvas>
+    <canvas id = "square" width = 500 height = 500>    </canvas>
     <script src="paper-core.js"></script>
     <script src="app2.js"></script>
     <script type="text/javascript" data-paper-ignore = "true">
         paper.setup(document.getElementById("square"))
         circles = [];
         flaps = [];
+        console.log("html",square.width/1.5);
         function drawBorder(){
-            border = new paper.Path.Rectangle(0,0,600,600);
+            border = new paper.Path.Rectangle(0,0,square.width/1.5,square.height/1.5);
             border.strokeColor = 'black';
             border.strokeWidth = 3;
         }
         drawBorder();
         function drawCircles(){
             for (var i=0;i<flaps.length;i++){
-                circle = new paper.Path.Circle(new paper.Point(flaps[i].x,flaps[i].y),flaps[i].r);
+                circle = new paper.Path.Circle(new paper.Point(
+                    flaps[i].x *square.width/1.5,
+                    flaps[i].y *square.width/1.5 *-1 + square.height/1.5
+                    ), 
+                    flaps[i].r*square.width/1.5);
                 circle.strokeColor = "black";
                 circle.fillColor = flaps[i].color
                 circle.strokeWidth = 1;

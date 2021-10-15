@@ -2,7 +2,6 @@
 var square = document.getElementById("square");
 var squareWidth = Number(square.style.width.slice(0, -2));
 var squareHeight = Number(square.style.height.slice(0, -2));
-console.log(squareWidth, squareHeight);
 var mousex;
 var mousey;
 window.addEventListener('mousemove', function (e) {
@@ -16,6 +15,7 @@ interface Square {
     clear: () => void;
     ctx: CanvasRenderingContext2D;
 } */
+//use the tree ancestries to find the disks, or just use the nodes
 var Disk = /** @class */ (function () {
     function Disk(edge) {
         this.index = edge.index;
@@ -30,7 +30,7 @@ var Disk = /** @class */ (function () {
 }());
 var River = /** @class */ (function () {
     function River(edge) {
-        this.r = edge.r * squareWidth;
+        this.r = edge.r;
     }
     return River;
 }());
