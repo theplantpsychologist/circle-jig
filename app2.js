@@ -1,12 +1,8 @@
+"use strict";
+//exports.__esModule = true;
 //'use strict'
 var square = document.getElementById("square");
 var ooga = "booga";
-var River = /** @class */ (function () {
-    function River(edge) {
-        this.r = edge.r;
-    }
-    return River;
-}());
 var tmd5;
 var scale;
 var flaps;
@@ -38,13 +34,14 @@ function extract() {
     paths = [];
     collectNodes(tmd5);
     collectEdges(tmd5);
-    collectFlaps(tmd5);
+    collectFlaps(nodes);
     //buildTree(nodes,edges);
     findChildren(nodes[1]); //node 1 is the root node
     for (var i = 1; i < nodes.length; i++) {
         findAnscestors(nodes[i], nodes[i]);
     }
     collectPaths(flaps);
+    collectRivers(edges);
 }
 //initializes by storing stuff into lists
 //by the end of this, all the nodes should have their parents 
@@ -82,17 +79,138 @@ var Edge = /** @class */ (function () {
     return Edge;
 }());
 //technically only leaf paths. Make sure distances update when nodes update
+var River = /** @class */ (function () {
+    function River(edge) {
+        this.r = edge.r;
+        this.edge = edge;
+        this.decideInnerFindSurrounded();
+        //this.calculateOuterPath();
+        //this.calculateInnerPath();
+        //maybe make the inner node have the r and river data? that way you don't have two rivers 
+        //trying to surround each other (ie have the same inner node)
+    }
+    River.prototype.decideInnerFindSurrounded = function () {
+        //find surrounded given either node as an option. then decide between the two
+        //decide which of the edge's nodes will be inner or outer.
+        //each node is given a score. each river attached to the node is 1000*it's r
+        //each flap attached is 100* it's r. smaller score is inner. if tie, then node1
+        var surroundedFlaps1 = [];
+        var surroundedRivers1 = [];
+        for (var i = 0; i < this.edge.node1.children.length; i++) {
+            if (this.edge.node1.children[i].leaf) {
+                surroundedFlaps1.push(this.edge.node1.children[1]);
+            }
+            if (!this.edge.node1.children[i].leaf && this.edge.node1.children[i] != this.edge.node2) {
+                surroundedRivers1.push(this.edge.node1.children[i]);
+            }
+        }
+        if (this.edge.node1.parent.leaf) {
+            surroundedFlaps1.push(this.edge.node1.children[1]);
+        }
+        if (!this.edge.node1.parent.leaf && this.edge.node1.children[i] != this.edge.node2) {
+            surroundedRivers1.push(this.edge.node1.children[i]);
+        }
+        var surroundedFlaps2 = [];
+        var surroundedRivers2 = [];
+        for (var i = 0; i < this.edge.node2.children.length; i++) {
+            if (this.edge.node2.children[i].leaf) {
+                surroundedFlaps2.push(this.edge.node2.children[1]);
+            }
+            if (!this.edge.node2.children[i].leaf && this.edge.node2.children[i] != this.edge.node1) {
+                surroundedRivers2.push(this.edge.node2.children[i]);
+            }
+        }
+        if (this.edge.node2.parent.leaf) {
+            surroundedFlaps2.push(this.edge.node2.children[1]);
+        }
+        if (!this.edge.node2.parent.leaf && this.edge.node2.children[i] != this.edge.node1) {
+            surroundedRivers2.push(this.edge.node2.children[i]);
+        }
+        //============================================
+        if (this.edge.node1.innerNode) {
+            this.innerNode = this.edge.node2;
+            this.innerNode.innerNode = true;
+            this.surroundedFlaps = surroundedFlaps2;
+            this.surroundedRivers = surroundedRivers2;
+            return;
+        } //if node1 is already taken by another river, you must use node2
+        if (this.edge.node2.innerNode) {
+            this.innerNode = this.edge.node1;
+            this.innerNode.innerNode = true;
+            this.surroundedFlaps = surroundedFlaps1;
+            this.surroundedRivers = surroundedRivers1;
+            return;
+        } //this could cause problems if both nodes are already taken but whatever
+        if (surroundedRivers1.length = 0) {
+            this.innerNode = this.edge.node1;
+            this.innerNode.innerNode = true;
+            this.surroundedFlaps = surroundedFlaps1;
+            this.surroundedRivers = surroundedRivers1;
+            return;
+        } //if there are no subrivers, make this the inner node bc it will be easy
+        if (surroundedRivers2.length = 0) {
+            this.innerNode = this.edge.node2;
+            this.innerNode.innerNode = true;
+            this.surroundedFlaps = surroundedFlaps2;
+            this.surroundedRivers = surroundedRivers2;
+            return;
+        } //it's possible that neither option will have subrivers, but then the tree is easy anyways
+        //??????????
+        if (surroundedFlaps1.length + 100 * surroundedRivers1.length > surroundedFlaps2.length + 100 * surroundedRivers2.length) {
+            //a weighting system to decide, kinda arbitrary i guess. nested rivers are pretty bad, avoid if possible
+            //PROBLEM: this logic isn't perfect, can lead to rivers wrapping around each other
+            this.innerNode = this.edge.node1;
+            this.innerNode.innerNode = true;
+            this.surroundedFlaps = surroundedFlaps1;
+            this.surroundedRivers = surroundedRivers1;
+            return;
+        }
+        else {
+            this.innerNode = this.edge.node2;
+            this.innerNode.innerNode = true;
+            this.surroundedFlaps = surroundedFlaps2;
+            this.surroundedRivers = surroundedRivers2;
+            return;
+        }
+    }; //a lot of problems in this function still. it can count subrivers but is just storing them as nodes still.
+    //also the inner/outer deciding is not perfect.
+    River.prototype.calculateOuterPath = function () {
+        this.outerPath = [];
+        if (this.surroundedRivers.length > 0) {
+            return;
+        }
+        //for every surrounded flap, add [r,x,y] to outerPath.
+        //find intersection points between circles. save the ones that are >= r + flapr, and save which arcs
+        //for each arc, make a list where the first and third elements are the intersection points, and the second one is also on the circle
+    };
+    River.prototype.calculateInnerPath = function () {
+        this.innerPath = [];
+        if (this.outerPath.length == 0) {
+            return;
+        }
+        //for every arc, create a new arc
+    };
+    return River;
+}());
+//helper function
+function arcConvert(x, y, r, theta0, thetaf) {
+    return [new paper.Point(x + r * Math.cos(theta0), x + r * Math.sin(theta0)),
+        new paper.Point(x + r * Math.cos((thetaf - theta0) / 2), y + r * Math.sin((thetaf - theta0) / 2)),
+        new paper.Point(x + r * Math.cos(thetaf), x + r * Math.sin(thetaf))];
+}
 var Path = /** @class */ (function () {
     function Path(node1, node2) {
         this.node1 = node1;
         this.node2 = node2;
+        this.check(this.node1, this.node2);
+    }
+    Path.prototype.check = function (node1, node2) {
         this.cpDistance = Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5);
-        if (Math.abs(findTreeDistance(node1, node2) - Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5)) < 0.0001) {
-            console.log(paths.length, "is active path");
+        if (Math.abs(findTreeDistance(node1, node2) - Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5)) < 0.00001) {
             this.isActive = true;
             this.isInvalid = false;
         }
-        else if (findTreeDistance(node1, node2) > Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5)) {
+        else if (findTreeDistance(node1, node2) > Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5) + 0.00001) {
             this.isInvalid = true;
             this.isActive = false;
         }
@@ -100,7 +218,7 @@ var Path = /** @class */ (function () {
             this.isActive = false;
             this.isInvalid = false;
         }
-    }
+    };
     return Path;
 }());
 function collectNodes(tmd5) {
@@ -189,7 +307,7 @@ function findTreeDistance(node1, node2) {
         }
     }
 }
-function collectFlaps(tmd5) {
+function collectFlaps(nodes) {
     for (var i = 1; i < nodes.length; i++) {
         if (nodes[i].leaf) {
             flaps.push(nodes[i]);
@@ -200,6 +318,13 @@ function collectPaths(flaps) {
     for (var i = 0; i < flaps.length; i++) {
         for (var j = i + 1; j < flaps.length; j++) {
             paths.push(new Path(flaps[i], flaps[j]));
+        }
+    }
+}
+function collectRivers(edges) {
+    for (var i = 1; i < edges.length; i++) {
+        if (!edges[i].node1.leaf && !edges[i].node2.leaf) {
+            rivers.push(new River(edges[i]));
         }
     }
 }

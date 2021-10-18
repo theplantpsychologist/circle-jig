@@ -4,18 +4,31 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree Helper</title>
+    <title>Circle Jig</title>
     <!---<link rel="stylesheet" href="main.css">--->
 
 </head>
 <body>
-    <h2>Tree Helper</h2>
+    <h2>Circle Jig</h2>
     <p>Instructions</p>
     <canvas id = "square" width = 500 height = 500>    </canvas>
     <script src="paper-core.js"></script>
     <script src="app2.js"></script>
     <script type="text/javascript" data-paper-ignore = "true">
-        paper.setup(document.getElementById("square"))
+        paper.setup(document.getElementById("square"));
+/*
+        point1 = new paper.Point(50,50);
+        point2 = new paper.Point(200,450);
+        point3 = new paper.Point(450,100);
+        path1 = new paper.Path.Arc(point1,point2,point3);
+        var riverStyle = {
+            strokeColor: "#A8F5FB",
+            //strokeJoin: "round"
+        }
+        path1.style = riverStyle;
+        path1.strokeWidth = 20
+*/
+
         circles = []; //the flaps drawn
         lines = []; //the paths drawn
         flaps = []; //an initial empty, once you extract from .tmd5, it will be replaced
@@ -39,9 +52,10 @@
                 circles.push(circle);
             }
         }
-        drawCircles();
+        drawCircles(); //should also draw the centers of the circles
         function drawPaths(){
             for (var i=0;i<paths.length;i++){
+                paths[i].check(paths[i].node1,paths[i].node2);
                 if (paths[i].isActive){
                     path = new paper.Path.Line();
                     path.add(new paper.Point(
@@ -69,11 +83,12 @@
         
         //---------------main---------------
         paper.view.onFrame = function(event){
-            for (var i=0; i<circles.length;i++){
+            /*for (var i=0; i<circles.length;i++){
                 circles[i].remove();
-            }
+            } */
             circles = [];
-            lines = [];
+            lines = []; 
+            paper.project.clear();
             drawCircles();
             border.remove()
             drawBorder();
