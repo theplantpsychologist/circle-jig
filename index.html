@@ -32,6 +32,7 @@
         circles = []; //the flaps drawn
         lines = []; //the paths drawn
         flaps = []; //an initial empty, once you extract from .tmd5, it will be replaced
+        rivers = [];
         paths = []
         function drawBorder(){
             border = new paper.Path.Rectangle(0,0,square.width/1.5,square.height/1.5);
@@ -39,6 +40,37 @@
             border.strokeWidth = 3;
         }
         drawBorder();
+        function calculateRivers(){
+            //current problems: some rivers aren't detecting their subrivers
+            //unable to unite bc the last for loop isn't working
+            //then have to subtract inner path
+            for(var i=0; i<rivers.length;i++){
+                var tempCircles = []
+                if (rivers[i].surroundedRivers.length>0){
+                    continue;
+                }
+                for(var j=0; j<rivers[i].surroundedFlaps.length; j++){
+
+                    tempCircles.push(new paper.Path.Circle({
+                        center: new paper.Point(
+                            rivers[i].surroundedFlaps[j].x *square.width/1.5,
+                            rivers[i].surroundedFlaps[j].y *square.width/1.5 *-1 + square.height/1.5),
+                        radius: (rivers[i].surroundedFlaps[j].r + rivers[i].r) *square.width/1.5
+                    }))
+                }
+                rivers[i].outerPath = tempCircles[1].unite(tempCircles[0]);
+                for(var j=0; j<tempCircles.length, j++;){
+                    rivers[i].outerPath = rivesr[i].outerPath.unite(tempCircles[j]);
+                    console.log("this thing",tempCircles.length,j)
+                    tempCircles[j].remove();
+                }
+                rivers[i].outerPath.fillColor = "cyan"
+                rivers[i].outerPath.strokeColor = "black"
+                //==================
+
+            }
+        }
+        calculateRivers()
         function drawCircles(){
             for (var i=0;i<flaps.length;i++){
                 circle = new paper.Path.Circle(new paper.Point(
@@ -89,10 +121,12 @@
             circles = [];
             lines = []; 
             paper.project.clear();
+            calculateRivers();
             drawCircles();
             border.remove()
             drawBorder();
             drawPaths();
+
         }
         paper.view.draw();
 
