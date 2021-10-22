@@ -113,28 +113,29 @@ function () {
   River.prototype.decideInnerFindSurrounded = function () {
     //find surrounded given either node as an option. then decide between the two
     //decide which of the edge's nodes will be inner or outer.
-    //each node is given a score. each river attached to the node is 1000*it's r
-    //each flap attached is 100* it's r. smaller score is inner. if tie, then node1
     var surroundedFlaps1 = [];
     var surroundedRivers1 = [];
 
     for (var i = 0; i < this.edge.node1.children.length; i++) {
       if (this.edge.node1.children[i].leaf) {
         surroundedFlaps1.push(this.edge.node1.children[i]);
+        console.log("surrounded flaps", surroundedFlaps1);
       }
 
       if (!(this.edge.node1.children[i].leaf || this.edge.node1.children[i] == this.edge.node2)) {
         surroundedRivers1.push(this.edge.node1.children[i]);
-        console.log(surroundedRivers1);
+        console.log("surrouned Rivers", surroundedRivers1);
       }
     }
 
-    if (this.edge.node1.parent.leaf) {
-      surroundedFlaps1.push(this.edge.node1.parent);
-    }
+    if (this.edge.node1.parent) {
+      if (this.edge.node1.parent.leaf) {
+        surroundedFlaps1.push(this.edge.node1.parent);
+      }
 
-    if (!(this.edge.node1.parent.leaf || this.edge.node1.parent == this.edge.node2)) {
-      surroundedRivers1.push(this.edge.node1.parent);
+      if (!(this.edge.node1.parent.leaf || this.edge.node1.parent == this.edge.node2)) {
+        surroundedRivers1.push(this.edge.node1.parent);
+      }
     }
 
     var surroundedFlaps2 = [];
@@ -150,12 +151,14 @@ function () {
       }
     }
 
-    if (this.edge.node2.parent.leaf) {
-      surroundedFlaps2.push(this.edge.node2.parent);
-    }
+    if (this.edge.node2.parent) {
+      if (this.edge.node2.parent.leaf) {
+        surroundedFlaps2.push(this.edge.node2.parent);
+      }
 
-    if (!(this.edge.node2.parent.leaf || this.edge.node2.parent != this.edge.node1)) {
-      surroundedRivers2.push(this.edge.node2.parent);
+      if (!(this.edge.node2.parent.leaf || this.edge.node2.parent != this.edge.node1)) {
+        surroundedRivers2.push(this.edge.node2.parent);
+      }
     } //============================================
 
 
@@ -216,38 +219,76 @@ function () {
 
   return River;
 }();
+/*
+calculateOuterPath(){ //for now ignore surrounded rivers
+    var tempArcs = [];
+    this.outerPath = [];
+    if(this.surroundedRivers.length > 0){
+        return
+    }
+    for (var i = 0; i<this.surroundedFlaps.length; i++){
+        tempArcs.push(new Arc(
+            this.surroundedFlaps[i].x,
+            this.surroundedFlaps[i].y,
+            this.surroundedFlaps[i].r))
+    }//for every surrounded flap, add the circle Arc(xyr) to tempArcs.
+    
+    //for every surrounded flap, find its intersections with other arcs. keep the intersection if it's legit
+    //for all the arcs in tempArcs, find the ones that have two valid intersections
 
-var Arc =
-/** @class */
-function () {
-  function Arc(x, y, r) {
+    //find intersection points between circles. save the ones that are >= r + flapr, and save which arcs
+    //for each arc, make a list where the first and third elements are the intersection points, and the second one is also on the circle
+
+}
+calculateInnerPath(){
+    this.innerPath = []
+    if(this.outerPath.length == 0){
+        return
+    }
+    //for every arc, create a new arc
+}
+//outer.subtract(inner);
+
+}
+
+class Arc{
+points: Array<paper.Point>; //first two will be actual intersections
+x: number;
+y: number;
+r: number;
+theta0: number;
+thetaf: number;
+
+constructor(x,y,r){
     this.x = x;
     this.y = y;
     this.r = r;
-  }
-
-  Arc.prototype.arcConvert = function (x, y, r, theta0, thetaf) {
+}
+arcConvert(x,y,r,theta0,thetaf){
     /*points new paper.Point(x+r*Math.cos(theta0),x+r*Math.sin(theta0));
     this.midpoint = new paper.Point(x+r*Math.cos((thetaf-theta0)/2),y+r*Math.sin((thetaf-theta0)/2));
-    this.point2 = new paper.Point(x+r*Math.cos(thetaf),x+r*Math.sin(thetaf));*/
-  };
-
-  Arc.prototype.findIntersections = function (arc2) {
-    var x1 = this.x;
-    var y1 = this.y;
-    var r1 = this.r;
-    var x2 = arc2.x;
-    var y2 = arc2.y;
-    var r2 = arc2.r;
-    var d = Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 0.5);
-    var l = (Math.pow(r1, 2) - Math.pow(r2, 2) + Math.pow(d, 2)) / (2 * d);
-    var h = Math.pow(Math.pow(r1, 2) - Math.pow(l, 2), 0.5);
-    return [new paper.Point(l / d * (x2 - x1) + h / d * (y2 - y1) + x1, l / d * (y2 - y1) - h / d * (x2 - x1) + y1), new paper.Point(l / d * (x2 - x1) - h / d * (y2 - y1) + x1, l / d * (y2 - y1) + h / d * (x2 - x1) + y1)];
-  }; //pretends the arcs are circles (only uses xyr) and returns an array of two intersection points https://math.stackexchange.com/questions/256100/how-can-i-find-the-points-at-which-two-circles-intersect
-
-
-  return Arc;
-}(); //a piece of a river
+    this.point2 = new paper.Point(x+r*Math.cos(thetaf),x+r*Math.sin(thetaf));
+}
+findIntersections(arc2: Arc){
+    var x1 = this.x
+    var y1 = this.y
+    var r1 = this.r
+    var x2 = arc2.x
+    var y2 = arc2.y
+    var r2 = arc2.r
+    var d = ((x1-x2)**2+(y1-y2)**2)**0.5
+    var l = (r1**2-r2**2+d**2)/(2*d)
+    var h = (r1**2 - l**2)**0.5
+    return [
+        new paper.Point(
+            l/d*(x2-x1) + h/d*(y2-y1)+x1,
+            l/d*(y2-y1) - h/d*(x2-x1)+y1),
+        new paper.Point(
+            l/d*(x2-x1) - h/d*(y2-y1)+x1,
+            l/d*(y2-y1) + h/d*(x2-x1)+y1)]
+}//pretends the arcs are circles (only uses xyr) and returns an array of two intersection points https://math.stackexchange.com/questions/256100/how-can-i-find-the-points-at-which-two-circles-intersect
+} //a piece of a river
+*/
 
 
 var Path =
@@ -262,10 +303,10 @@ function () {
   Path.prototype.check = function (node1, node2) {
     this.cpDistance = Math.pow(Math.pow(node1.x - node2.x, 2) + Math.pow(node1.y - node2.y, 2), 0.5);
 
-    if (Math.abs(findTreeDistance(node1, node2) - Math.pow(Math.pow(node1.x - node2.x, 2) + Math.pow(node1.y - node2.y, 2), 0.5)) < 0.00001) {
+    if (Math.abs(findTreeDistance(node1, node2) - Math.pow(Math.pow(node1.x - node2.x, 2) + Math.pow(node1.y - node2.y, 2), 0.5)) < 0.0005) {
       this.isActive = true;
       this.isInvalid = false;
-    } else if (findTreeDistance(node1, node2) > Math.pow(Math.pow(node1.x - node2.x, 2) + Math.pow(node1.y - node2.y, 2), 0.5) + 0.00001) {
+    } else if (findTreeDistance(node1, node2) > Math.pow(Math.pow(node1.x - node2.x, 2) + Math.pow(node1.y - node2.y, 2), 0.5) + 0.0005) {
       this.isInvalid = true;
       this.isActive = false;
     } else {

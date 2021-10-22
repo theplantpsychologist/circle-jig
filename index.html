@@ -41,31 +41,45 @@
         }
         drawBorder();
         function calculateRivers(){
-            //current problems: some rivers aren't detecting their subrivers
-            //unable to unite bc the last for loop isn't working
-            //then have to subtract inner path
+            //current problems: 
+            //rivers aren't detecting their subrivers bc can't push to surroundedRivers1
+            //have to subtract inner path
+            //the thing patched up with a try catch
+            //what happens when paths in a cluster are not actively connected
+            //color scheme
+
+
             for(var i=0; i<rivers.length;i++){
                 var tempCircles = []
                 if (rivers[i].surroundedRivers.length>0){
                     continue;
+                    //if the subriver doesn't have it's outer path, wait, and do it on the next iteration
+                    
                 }
+                //surrounded flaps: all the flaps inside a river, including inside subrivers. 
+                //the radius of the outer path around the flap will be the distance from inner to the flap + r
+            
                 for(var j=0; j<rivers[i].surroundedFlaps.length; j++){
 
                     tempCircles.push(new paper.Path.Circle({
                         center: new paper.Point(
                             rivers[i].surroundedFlaps[j].x *square.width/1.5,
                             rivers[i].surroundedFlaps[j].y *square.width/1.5 *-1 + square.height/1.5),
-                        radius: (rivers[i].surroundedFlaps[j].r + rivers[i].r) *square.width/1.5
+                        //radius: (rivers[i].surroundedFlaps[j].r + rivers[i].r) *square.width/1.5
+                        radius: (findTreeDistance(rivers[i].surroundedFlaps[j],rivers[i].innerNode) + rivers[i].r) *square.width/1.5
                     }))
                 }
-                rivers[i].outerPath = tempCircles[1].unite(tempCircles[0]);
-                for(var j=0; j<tempCircles.length, j++;){
-                    rivers[i].outerPath = rivesr[i].outerPath.unite(tempCircles[j]);
-                    console.log("this thing",tempCircles.length,j)
+                rivers[i].outerPath = tempCircles[0];
+                for(var j=1; j<tempCircles.length; j++){
+                    rivers[i].outerPath = rivers[i].outerPath.unite(tempCircles[j]);
                     tempCircles[j].remove();
                 }
-                rivers[i].outerPath.fillColor = "cyan"
-                rivers[i].outerPath.strokeColor = "black"
+                try{
+                    rivers[i].outerPath.fillColor = "cyan"
+                    rivers[i].outerPath.strokeColor = "black"
+                }catch{
+                    0
+                }
                 //==================
 
             }
@@ -89,21 +103,21 @@
             for (var i=0;i<paths.length;i++){
                 paths[i].check(paths[i].node1,paths[i].node2);
                 if (paths[i].isActive){
-                    path = new paper.Path.Line();
-                    path.add(new paper.Point(
+                    path = new paper.Path.Line(
+                    new paper.Point(
                             paths[i].node1.x *square.width/1.5,
-                            paths[i].node1.y *square.width/1.5 *-1 + square.height/1.5))
-                    path.add(new paper.Point(
+                            paths[i].node1.y *square.width/1.5 *-1 + square.height/1.5),
+                    new paper.Point(
                             paths[i].node2.x *square.width/1.5,
                             paths[i].node2.y *square.width/1.5 *-1 + square.height/1.5));
                     path.strokeColor = 'lime';
                     lines.push(path);
                 } else if (paths[i].isInvalid){
-                    path = new paper.Path.Line()
-                        path.add(new paper.Point(
+                    path = new paper.Path.Line(
+                    new paper.Point(
                             paths[i].node1.x *square.width/1.5,
-                            paths[i].node1.y *square.width/1.5 *-1 + square.height/1.5))
-                    path.add(new paper.Point(
+                            paths[i].node1.y *square.width/1.5 *-1 + square.height/1.5),
+                    new paper.Point(
                             paths[i].node2.x *square.width/1.5,
                             paths[i].node2.y *square.width/1.5 *-1 + square.height/1.5));
                     path.strokeColor = 'red';
