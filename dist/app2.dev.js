@@ -49,6 +49,10 @@ function extract() {
 
   collectPaths(flaps);
   collectRivers(edges);
+
+  for (var i = 0; i < rivers.length; i++) {
+    decideInnerFindSurrounded(rivers[i]);
+  }
 } //initializes by storing stuff into lists
 //by the end of this, all the nodes should have their parents 
 
@@ -103,193 +107,68 @@ var River =
 function () {
   function River(edge) {
     this.r = edge.r;
-    this.edge = edge;
-    this.decideInnerFindSurrounded(); //this.calculateOuterPath();
-    //this.calculateInnerPath();
+    this.edge = edge; //this.decideInnerFindSurrounded();
     //maybe make the inner node have the r and river data? that way you don't have two rivers 
     //trying to surround each other (ie have the same inner node)
   }
 
-  River.prototype.decideInnerFindSurrounded = function () {
-    //find surrounded given either node as an option. then decide between the two
-    //decide which of the edge's nodes will be inner or outer.
-    var surroundedFlaps1 = [];
-    var surroundedRivers1 = [];
-
-    for (var i = 0; i < this.edge.node1.children.length; i++) {
-      if (this.edge.node1.children[i].leaf) {
-        surroundedFlaps1.push(this.edge.node1.children[i]);
-        console.log("surrounded flaps", surroundedFlaps1);
-      }
-
-      if (!(this.edge.node1.children[i].leaf || this.edge.node1.children[i] == this.edge.node2)) {
-        surroundedRivers1.push(this.edge.node1.children[i]);
-        console.log("surrouned Rivers", surroundedRivers1);
-      }
-    }
-
-    if (this.edge.node1.parent) {
-      if (this.edge.node1.parent.leaf) {
-        surroundedFlaps1.push(this.edge.node1.parent);
-      }
-
-      if (!(this.edge.node1.parent.leaf || this.edge.node1.parent == this.edge.node2)) {
-        surroundedRivers1.push(this.edge.node1.parent);
-      }
-    }
-
-    var surroundedFlaps2 = [];
-    var surroundedRivers2 = [];
-
-    for (var i = 0; i < this.edge.node2.children.length; i++) {
-      if (this.edge.node2.children[i].leaf) {
-        surroundedFlaps2.push(this.edge.node2.children[i]);
-      }
-
-      if (!(this.edge.node2.children[i].leaf || this.edge.node2.children[i] != this.edge.node1)) {
-        surroundedRivers2.push(this.edge.node2.children[i]);
-      }
-    }
-
-    if (this.edge.node2.parent) {
-      if (this.edge.node2.parent.leaf) {
-        surroundedFlaps2.push(this.edge.node2.parent);
-      }
-
-      if (!(this.edge.node2.parent.leaf || this.edge.node2.parent != this.edge.node1)) {
-        surroundedRivers2.push(this.edge.node2.parent);
-      }
-    } //============================================
-
-
-    if (this.edge.node1.innerNode) {
-      this.innerNode = this.edge.node2;
-      this.innerNode.innerNode = true;
-      this.surroundedFlaps = surroundedFlaps2;
-      this.surroundedRivers = surroundedRivers2;
-      return;
-    } //if node1 is already taken by another river, you must use node2
-
-
-    if (this.edge.node2.innerNode) {
-      this.innerNode = this.edge.node1;
-      this.innerNode.innerNode = true;
-      this.surroundedFlaps = surroundedFlaps1;
-      this.surroundedRivers = surroundedRivers1;
-      return;
-    } //this could cause problems if both nodes are already taken but whatever
-
-
-    if (surroundedRivers1.length = 0) {
-      this.innerNode = this.edge.node1;
-      this.innerNode.innerNode = true;
-      this.surroundedFlaps = surroundedFlaps1;
-      this.surroundedRivers = surroundedRivers1;
-      return;
-    } //if there are no subrivers, make this the inner node bc it will be easy
-
-
-    if (surroundedRivers2.length = 0) {
-      this.innerNode = this.edge.node2;
-      this.innerNode.innerNode = true;
-      this.surroundedFlaps = surroundedFlaps2;
-      this.surroundedRivers = surroundedRivers2;
-      return;
-    } //it's possible that neither option will have subrivers, but then the tree is easy anyways
-    //??????????
-
-
-    if (surroundedFlaps1.length + 100 * surroundedRivers1.length > surroundedFlaps2.length + 100 * surroundedRivers2.length) {
-      //a weighting system to decide, kinda arbitrary i guess. nested rivers are pretty bad, avoid if possible
-      //PROBLEM: this logic isn't perfect, can lead to rivers wrapping around each other
-      this.innerNode = this.edge.node1;
-      this.innerNode.innerNode = true;
-      this.surroundedFlaps = surroundedFlaps1;
-      this.surroundedRivers = surroundedRivers1;
-      return;
-    } else {
-      this.innerNode = this.edge.node2;
-      this.innerNode.innerNode = true;
-      this.surroundedFlaps = surroundedFlaps2;
-      this.surroundedRivers = surroundedRivers2;
-      return;
-    }
-  }; //a lot of problems in this function still. it can count subrivers but is just storing them as nodes still.
-
-
   return River;
 }();
-/*
-calculateOuterPath(){ //for now ignore surrounded rivers
-    var tempArcs = [];
-    this.outerPath = [];
-    if(this.surroundedRivers.length > 0){
-        return
+
+function findSurrounded(inner, outer) {
+  var surroundedFlaps = [];
+
+  for (var i = 0; i < inner.children.length; i++) {
+    if (inner.children[i].leaf) {
+      surroundedFlaps.push(inner.children[i]);
     }
-    for (var i = 0; i<this.surroundedFlaps.length; i++){
-        tempArcs.push(new Arc(
-            this.surroundedFlaps[i].x,
-            this.surroundedFlaps[i].y,
-            this.surroundedFlaps[i].r))
-    }//for every surrounded flap, add the circle Arc(xyr) to tempArcs.
-    
-    //for every surrounded flap, find its intersections with other arcs. keep the intersection if it's legit
-    //for all the arcs in tempArcs, find the ones that have two valid intersections
 
-    //find intersection points between circles. save the ones that are >= r + flapr, and save which arcs
-    //for each arc, make a list where the first and third elements are the intersection points, and the second one is also on the circle
-
-}
-calculateInnerPath(){
-    this.innerPath = []
-    if(this.outerPath.length == 0){
-        return
+    if (!(inner.children[i].leaf || inner.children[i] == outer)) {
+      surroundedFlaps = surroundedFlaps.concat(findSurrounded(inner.children[i], inner));
     }
-    //for every arc, create a new arc
-}
-//outer.subtract(inner);
+  }
 
+  if (inner.parent) {
+    if (inner.parent.leaf) {
+      surroundedFlaps.push(inner.parent);
+    }
+
+    if (!(inner.parent.leaf || inner.parent == outer)) {
+      surroundedFlaps = surroundedFlaps.concat(findSurrounded(inner.parent, inner));
+    }
+  }
+
+  return surroundedFlaps;
 }
 
-class Arc{
-points: Array<paper.Point>; //first two will be actual intersections
-x: number;
-y: number;
-r: number;
-theta0: number;
-thetaf: number;
+function decideInnerFindSurrounded(river) {
+  if (river.edge.node1.innerNode) {
+    river.surroundedFlaps = findSurrounded(river.edge.node2, river.edge.node1);
+    river.innerNode = river.edge.node2;
+    river.innerNode.innerNode = true;
+    return;
+  }
 
-constructor(x,y,r){
-    this.x = x;
-    this.y = y;
-    this.r = r;
-}
-arcConvert(x,y,r,theta0,thetaf){
-    /*points new paper.Point(x+r*Math.cos(theta0),x+r*Math.sin(theta0));
-    this.midpoint = new paper.Point(x+r*Math.cos((thetaf-theta0)/2),y+r*Math.sin((thetaf-theta0)/2));
-    this.point2 = new paper.Point(x+r*Math.cos(thetaf),x+r*Math.sin(thetaf));
-}
-findIntersections(arc2: Arc){
-    var x1 = this.x
-    var y1 = this.y
-    var r1 = this.r
-    var x2 = arc2.x
-    var y2 = arc2.y
-    var r2 = arc2.r
-    var d = ((x1-x2)**2+(y1-y2)**2)**0.5
-    var l = (r1**2-r2**2+d**2)/(2*d)
-    var h = (r1**2 - l**2)**0.5
-    return [
-        new paper.Point(
-            l/d*(x2-x1) + h/d*(y2-y1)+x1,
-            l/d*(y2-y1) - h/d*(x2-x1)+y1),
-        new paper.Point(
-            l/d*(x2-x1) - h/d*(y2-y1)+x1,
-            l/d*(y2-y1) + h/d*(x2-x1)+y1)]
-}//pretends the arcs are circles (only uses xyr) and returns an array of two intersection points https://math.stackexchange.com/questions/256100/how-can-i-find-the-points-at-which-two-circles-intersect
-} //a piece of a river
-*/
+  if (river.edge.node2.innerNode) {
+    river.surroundedFlaps = findSurrounded(river.edge.node1, river.edge.node2);
+    river.innerNode = river.edge.node1;
+    river.innerNode.innerNode = true;
+    return;
+  }
 
+  var surrounded1 = findSurrounded(river.edge.node1, river.edge.node2);
+  var surrounded2 = findSurrounded(river.edge.node2, river.edge.node1);
+
+  if (surrounded1.length < surrounded2.length) {
+    river.surroundedFlaps = surrounded1;
+    river.innerNode = river.edge.node1;
+    river.innerNode.innerNode = true;
+  } else {
+    river.surroundedFlaps = surrounded2;
+    river.innerNode = river.edge.node2;
+    river.innerNode.innerNode = true;
+  }
+}
 
 var Path =
 /** @class */
@@ -445,3 +324,74 @@ function collectRivers(edges) {
     }
   }
 } //if something changes length, update all paths
+
+/*
+calculateOuterPath(){ //for now ignore surrounded rivers
+    var tempArcs = [];
+    this.outerPath = [];
+    if(this.surroundedRivers.length > 0){
+        return
+    }
+    for (var i = 0; i<this.surroundedFlaps.length; i++){
+        tempArcs.push(new Arc(
+            this.surroundedFlaps[i].x,
+            this.surroundedFlaps[i].y,
+            this.surroundedFlaps[i].r))
+    }//for every surrounded flap, add the circle Arc(xyr) to tempArcs.
+    
+    //for every surrounded flap, find its intersections with other arcs. keep the intersection if it's legit
+    //for all the arcs in tempArcs, find the ones that have two valid intersections
+
+    //find intersection points between circles. save the ones that are >= r + flapr, and save which arcs
+    //for each arc, make a list where the first and third elements are the intersection points, and the second one is also on the circle
+
+}
+calculateInnerPath(){
+    this.innerPath = []
+    if(this.outerPath.length == 0){
+        return
+    }
+    //for every arc, create a new arc
+}
+//outer.subtract(inner);
+
+}
+
+class Arc{
+points: Array<paper.Point>; //first two will be actual intersections
+x: number;
+y: number;
+r: number;
+theta0: number;
+thetaf: number;
+
+constructor(x,y,r){
+    this.x = x;
+    this.y = y;
+    this.r = r;
+}
+arcConvert(x,y,r,theta0,thetaf){
+    /*points new paper.Point(x+r*Math.cos(theta0),x+r*Math.sin(theta0));
+    this.midpoint = new paper.Point(x+r*Math.cos((thetaf-theta0)/2),y+r*Math.sin((thetaf-theta0)/2));
+    this.point2 = new paper.Point(x+r*Math.cos(thetaf),x+r*Math.sin(thetaf));
+}
+findIntersections(arc2: Arc){
+    var x1 = this.x
+    var y1 = this.y
+    var r1 = this.r
+    var x2 = arc2.x
+    var y2 = arc2.y
+    var r2 = arc2.r
+    var d = ((x1-x2)**2+(y1-y2)**2)**0.5
+    var l = (r1**2-r2**2+d**2)/(2*d)
+    var h = (r1**2 - l**2)**0.5
+    return [
+        new paper.Point(
+            l/d*(x2-x1) + h/d*(y2-y1)+x1,
+            l/d*(y2-y1) - h/d*(x2-x1)+y1),
+        new paper.Point(
+            l/d*(x2-x1) - h/d*(y2-y1)+x1,
+            l/d*(y2-y1) + h/d*(x2-x1)+y1)]
+}//pretends the arcs are circles (only uses xyr) and returns an array of two intersection points https://math.stackexchange.com/questions/256100/how-can-i-find-the-points-at-which-two-circles-intersect
+} //a piece of a river
+*/

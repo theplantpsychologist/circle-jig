@@ -47,18 +47,10 @@
             //the thing patched up with a try catch
             //what happens when paths in a cluster are not actively connected
             //color scheme
-
-
             for(var i=0; i<rivers.length;i++){
                 var tempCircles = []
-                if (rivers[i].surroundedRivers.length>0){
-                    continue;
-                    //if the subriver doesn't have it's outer path, wait, and do it on the next iteration
-                    
-                }
                 //surrounded flaps: all the flaps inside a river, including inside subrivers. 
                 //the radius of the outer path around the flap will be the distance from inner to the flap + r
-            
                 for(var j=0; j<rivers[i].surroundedFlaps.length; j++){
 
                     tempCircles.push(new paper.Path.Circle({
@@ -69,6 +61,9 @@
                         radius: (findTreeDistance(rivers[i].surroundedFlaps[j],rivers[i].innerNode) + rivers[i].r) *square.width/1.5
                     }))
                 }
+                //==================
+                var intersections = [] //intersections between two outer path arcs
+
                 rivers[i].outerPath = tempCircles[0];
                 for(var j=1; j<tempCircles.length; j++){
                     rivers[i].outerPath = rivers[i].outerPath.unite(tempCircles[j]);
@@ -80,8 +75,7 @@
                 }catch{
                     0
                 }
-                //==================
-
+                
             }
         }
         calculateRivers()

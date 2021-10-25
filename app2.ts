@@ -120,99 +120,53 @@ class River {
 		//trying to surround each other (ie have the same inner node)
 	}
 }
-function decideInnerFindSurrounded(this: River){
-	//find surrounded given either node as an option. then decide between the two
-	//decide which of the edge's nodes will be inner or outer.
-	var surroundedFlaps1 = []
-	var surroundedRivers1 = []
-	for (var i = 0; i<this.edge.node1.children.length; i++){
-		if (this.edge.node1.children[i].leaf){
-			surroundedFlaps1.push(this.edge.node1.children[i]);
-			//console.log("surrounded flaps", surroundedFlaps1);
-		}
-		if (!(this.edge.node1.children[i].leaf || this.edge.node1.children[i]==this.edge.node2)){
-			surroundedRivers1.push(this.edge.node1.children[i]);
-			//console.log("surrouned Rivers",surroundedRivers1);
 
-			//instead, should somehow pass the surrounded flaps of the subriver into the current one
+function findSurrounded(inner: TreeNode, outer: TreeNode){
+	var surroundedFlaps = []
+	for(var i=0; i< inner.children.length; i++){
+		if (inner.children[i].leaf){
+			surroundedFlaps.push(inner.children[i])
+		}
+		if(!(inner.children[i].leaf || inner.children[i]==outer)){
+			surroundedFlaps = surroundedFlaps.concat(findSurrounded(inner.children[i],inner))
 		}
 	}
-	if(this.edge.node1.parent){
-		if (this.edge.node1.parent.leaf){
-			surroundedFlaps1.push(this.edge.node1.parent);
+	if(inner.parent){
+		if (inner.parent.leaf){
+			surroundedFlaps.push(inner.parent)
 		}
-		if (!(this.edge.node1.parent.leaf || this.edge.node1.parent==this.edge.node2)){
-			surroundedRivers1.push(this.edge.node1.parent);
-		}
-	}
-
-	var surroundedFlaps2 = []
-	var surroundedRivers2 = []
-	for (var i = 0; i<this.edge.node2.children.length; i++){
-		if (this.edge.node2.children[i].leaf){
-			surroundedFlaps2.push(this.edge.node2.children[i]);
-		}
-		if (!(this.edge.node2.children[i].leaf || this.edge.node2.children[i]!=this.edge.node1)){
-			surroundedRivers2.push(this.edge.node2.children[i]);
+		if(!(inner.parent.leaf||inner.parent==outer)){
+			surroundedFlaps = surroundedFlaps.concat(findSurrounded(inner.parent,inner))
 		}
 	}
-	if(this.edge.node2.parent){
-		if (this.edge.node2.parent.leaf){
-			surroundedFlaps2.push(this.edge.node2.parent);
-		}
-		if (!(this.edge.node2.parent.leaf || this.edge.node2.parent!=this.edge.node1)){
-			surroundedRivers2.push(this.edge.node2.parent);
-		}
-	}
-	//============================================
-	if (this.edge.node1.innerNode){
-		this.innerNode = this.edge.node2
-		this.innerNode.innerNode = true
-		this.surroundedFlaps = surroundedFlaps2
-		this.surroundedRivers = surroundedRivers2
-		return
-	} //if node1 is already taken by another river, you must use node2
-	if (this.edge.node2.innerNode){
-		this.innerNode = this.edge.node1
-		this.innerNode.innerNode = true
-		this.surroundedFlaps = surroundedFlaps1
-		this.surroundedRivers = surroundedRivers1
-		return 
-	} //this could cause problems if both nodes are already taken but whatever
-	if (surroundedRivers1.length = 0){
-		this.innerNode = this.edge.node1
-		this.innerNode.innerNode = true
-		this.surroundedFlaps = surroundedFlaps1
-		this.surroundedRivers = surroundedRivers1
-		return 
-	} //if there are no subrivers, make this the inner node bc it will be easy
-	if (surroundedRivers2.length = 0){
-		this.innerNode = this.edge.node2
-		this.innerNode.innerNode = true
-		this.surroundedFlaps = surroundedFlaps2
-		this.surroundedRivers = surroundedRivers2
-		return 
-	} //it's possible that neither option will have subrivers, but then the tree is easy anyways
-	//??????????
-	if(surroundedFlaps1.length + 100*surroundedRivers1.length > surroundedFlaps2.length + 100*surroundedRivers2.length){
-		//a weighting system to decide, kinda arbitrary i guess. nested rivers are pretty bad, avoid if possible
-		//PROBLEM: this logic isn't perfect, can lead to rivers wrapping around each other
-		this.innerNode = this.edge.node1
-		this.innerNode.innerNode = true
-		this.surroundedFlaps = surroundedFlaps1
-		this.surroundedRivers = surroundedRivers1
-		return
-	} else {
-		this.innerNode = this.edge.node2
-		this.innerNode.innerNode = true
-		this.surroundedFlaps = surroundedFlaps2
-		this.surroundedRivers = surroundedRivers2
+	return surroundedFlaps
+}
+function decideInnerFindSurrounded(river: River){
+	if(river.edge.node1.innerNode){
+		river.surroundedFlaps = findSurrounded(river.edge.node2,river.edge.node1)
+		river.innerNode = river.edge.node2
+		river.innerNode.innerNode = true
 		return
 	}
+	if(river.edge.node2.innerNode){
+		river.surroundedFlaps = findSurrounded(river.edge.node1,river.edge.node2)
+		river.innerNode = river.edge.node1
+		river.innerNode.innerNode = true
+		return
+	}
+	var surrounded1 = findSurrounded(river.edge.node1,river.edge.node2)
+	var surrounded2 = findSurrounded(river.edge.node2,river.edge.node1)
+	if(surrounded1.length<surrounded2.length){
+		river.surroundedFlaps = surrounded1
+		river.innerNode = river.edge.node1
+		river.innerNode.innerNode = true
+	} else{
+		river.surroundedFlaps = surrounded2
+		river.innerNode = river.edge.node2
+		river.innerNode.innerNode = true
+	}
+}
 
-
-} //a lot of problems in this function still. it can count subrivers but is just storing them as nodes still.
-//also the inner/outer deciding is not perfect.
 
 
 class Path {
