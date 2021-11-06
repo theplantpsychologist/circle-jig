@@ -116,12 +116,14 @@ function decideInnerFindSurrounded(river) {
     if (river.edge.node1.innerNode) {
         river.surroundedFlaps = findSurrounded(river.edge.node2, river.edge.node1);
         river.innerNode = river.edge.node2;
+        river.outerNode = river.edge.node1;
         river.innerNode.innerNode = true;
         return;
     }
     if (river.edge.node2.innerNode) {
         river.surroundedFlaps = findSurrounded(river.edge.node1, river.edge.node2);
         river.innerNode = river.edge.node1;
+        river.outerNode = river.edge.node2;
         river.innerNode.innerNode = true;
         return;
     }
@@ -130,11 +132,13 @@ function decideInnerFindSurrounded(river) {
     if (surrounded1.length < surrounded2.length) {
         river.surroundedFlaps = surrounded1;
         river.innerNode = river.edge.node1;
+        river.outerNode = river.edge.node2;
         river.innerNode.innerNode = true;
     }
     else {
         river.surroundedFlaps = surrounded2;
         river.innerNode = river.edge.node2;
+        river.outerNode = river.edge.node1;
         river.innerNode.innerNode = true;
     }
 }

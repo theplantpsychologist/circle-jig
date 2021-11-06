@@ -42,10 +42,7 @@
         drawBorder();
         function calculateRivers(){
             //current problems: 
-            //rivers aren't detecting their subrivers bc can't push to surroundedRivers1
-            //have to subtract inner path
             //the thing patched up with a try catch
-            //what happens when paths in a cluster are not actively connected
             //color scheme
             for(var i=0; i<rivers.length;i++){
                 var tempCircles = []
@@ -60,14 +57,71 @@
                         //radius: (rivers[i].surroundedFlaps[j].r + rivers[i].r) *square.width/1.5
                         radius: (findTreeDistance(rivers[i].surroundedFlaps[j],rivers[i].innerNode) + rivers[i].r) *square.width/1.5
                     }))
-                }
+                }//find all the circles in the outer path
                 //==================
                 var intersections = [] //intersections between two outer path arcs
-
+                var subtractions = [] //quadrilaterals: the centers of the two circles and their intersections
+                for(var j=0; j<rivers[i].surroundedFlaps.length; j++){
+                    for(var k=j;k<rivers[i].surroundedFlaps.length;k++){//nested loop to find all pairs
+                        var intersection = tempCircles[j].getIntersections(tempCircles[k])
+                        if(intersection.length != 2){
+                            continue
+                        }
+                        var intersection1 = true;
+                        var intersection2 = true;
+                        //////////
+                        var subtraction = new paper.Path()
+                        subtraction.add(
+                            intersection[0].point,
+                            new paper.Point(
+                                rivers[i].surroundedFlaps[j].x*square.width/1.5,
+                                rivers[i].surroundedFlaps[j].y *square.width/1.5 *-1 + square.height/1.5),
+                            intersection[1].point,
+                            new paper.Point(
+                                rivers[i].surroundedFlaps[k].x*square.width/1.5,
+                                rivers[i].surroundedFlaps[k].y *square.width/1.5 *-1 + square.height/1.5))
+                        subtractions.push(subtraction)
+                        /////////
+                        chunk1 = new paper.Path.Circle({
+                            center: intersection[0].point,
+                            radius: rivers[i].r*square.width/1.5
+                        })
+                        chunk2 = new paper.Path.Circle({
+                            center: intersection[1].point,
+                            radius: rivers[i].r*square.width/1.5
+                        })
+                        for(var l = 0; l<rivers[i].surroundedFlaps.length; l++){
+                            //iterating through all surrounded flaps to see if the intersection is internal
+                            if(intersection1 && intersection[0].point.getDistance(new paper.Point(
+                                rivers[i].surroundedFlaps[l].x*square.width/1.5,
+                                rivers[i].surroundedFlaps[l].y *square.width/1.5 *-1 + square.height/1.5)
+                                ) <
+                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*square.width/1.5 + 0.000001
+                            ){
+                                intersection1 = false;
+                            }
+                            if(intersection2 && intersection[1].point.getDistance(new paper.Point(
+                                rivers[i].surroundedFlaps[l].x*square.width/1.5,
+                                rivers[i].surroundedFlaps[l].y *square.width/1.5 *-1 + square.height/1.5)
+                                ) <
+                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*square.width/1.5 + 0.000001
+                            ){
+                                intersection2 = false;
+                            }
+                        }
+                        if(intersection1){intersections.push(chunk1.intersect(subtraction))}
+                        if(intersection2){intersections.push(chunk2.intersect(subtraction))}
+                    }
+                }
                 rivers[i].outerPath = tempCircles[0];
-                for(var j=1; j<tempCircles.length; j++){
+                for(var j=1; j<rivers[i].surroundedFlaps.length; j++){ //for every surrounded flap, there is a tempCircle
                     rivers[i].outerPath = rivers[i].outerPath.unite(tempCircles[j]);
-                    tempCircles[j].remove();
+                }//merge all the circles of radius += river radius
+                for(var j = 0; j<subtractions.length; j++){
+                    rivers[i].outerPath = rivers[i].outerPath.subtract(subtractions[j])
+                }//remove all the internal quadrilaterals
+                for(var j=0; j<intersections.length; j++){
+                    rivers[i].outerPath = rivers[i].outerPath.unite(intersections[j])
                 }
                 try{
                     rivers[i].outerPath.fillColor = "cyan"
