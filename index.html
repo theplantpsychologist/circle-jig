@@ -35,9 +35,10 @@
         rivers = [];
         paths = []
         function drawBorder(){
-            border = new paper.Path.Rectangle(0,0,square.width/1.5,square.height/1.5);
+            border = new paper.Path.Rectangle(0,0,square.width/1.2,square.height/1.2);
             border.strokeColor = 'black';
             border.strokeWidth = 3;
+            return border
         }
         drawBorder();
         function calculateRivers(){
@@ -52,10 +53,10 @@
 
                     tempCircles.push(new paper.Path.Circle({
                         center: new paper.Point(
-                            rivers[i].surroundedFlaps[j].x *square.width/1.5,
-                            rivers[i].surroundedFlaps[j].y *square.width/1.5 *-1 + square.height/1.5),
-                        //radius: (rivers[i].surroundedFlaps[j].r + rivers[i].r) *square.width/1.5
-                        radius: (findTreeDistance(rivers[i].surroundedFlaps[j],rivers[i].innerNode) + rivers[i].r) *square.width/1.5
+                            rivers[i].surroundedFlaps[j].x *square.width/1.2,
+                            rivers[i].surroundedFlaps[j].y *square.width/1.2 *-1 + square.height/1.2),
+                        //radius: (rivers[i].surroundedFlaps[j].r + rivers[i].r) *square.width/1.2
+                        radius: (findTreeDistance(rivers[i].surroundedFlaps[j],rivers[i].innerNode) + rivers[i].r) *square.width/1.2
                     }))
                 }//find all the circles in the outer path
                 //==================
@@ -73,27 +74,27 @@
                         /////////
                         chunk1 = new paper.Path.Circle({
                             center: intersection[0].point,
-                            radius: rivers[i].r*square.width/1.5
+                            radius: rivers[i].r*square.width/1.2
                         })
                         chunk2 = new paper.Path.Circle({
                             center: intersection[1].point,
-                            radius: rivers[i].r*square.width/1.5
+                            radius: rivers[i].r*square.width/1.2
                         })  
                         for(var l = 0; l<rivers[i].surroundedFlaps.length; l++){
                             //iterating through all surrounded flaps to see if the intersection is internal
                             if(intersection1 && intersection[0].point.getDistance(new paper.Point(
-                                rivers[i].surroundedFlaps[l].x*square.width/1.5,
-                                rivers[i].surroundedFlaps[l].y *square.width/1.5 *-1 + square.height/1.5)
+                                rivers[i].surroundedFlaps[l].x*square.width/1.2,
+                                rivers[i].surroundedFlaps[l].y *square.width/1.2 *-1 + square.height/1.2)
                                 ) <
-                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*square.width/1.5 + 0.000001
+                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*square.width/1.2 + 0.000001
                             ){
                                 intersection1 = false;
                             }
                             if(intersection2 && intersection[1].point.getDistance(new paper.Point(
-                                rivers[i].surroundedFlaps[l].x*square.width/1.5,
-                                rivers[i].surroundedFlaps[l].y *square.width/1.5 *-1 + square.height/1.5)
+                                rivers[i].surroundedFlaps[l].x*square.width/1.2,
+                                rivers[i].surroundedFlaps[l].y *square.width/1.2 *-1 + square.height/1.2)
                                 ) <
-                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*square.width/1.5 + 0.000001
+                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*square.width/1.2 + 0.000001
                             ){
                                 intersection2 = false;
                             }
@@ -104,33 +105,33 @@
                             subtraction1.add(
                                 intersection[0].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[j].x*square.width/1.5,
-                                    rivers[i].surroundedFlaps[j].y *square.width/1.5 *-1 + square.height/1.5),
+                                    rivers[i].surroundedFlaps[j].x*square.width/1.2,
+                                    rivers[i].surroundedFlaps[j].y *square.width/1.2 *-1 + square.height/1.2),
                                 //intersection[1].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[k].x*square.width/1.5,
-                                    rivers[i].surroundedFlaps[k].y *square.width/1.5 *-1 + square.height/1.5))
+                                    rivers[i].surroundedFlaps[k].x*square.width/1.2,
+                                    rivers[i].surroundedFlaps[k].y *square.width/1.2 *-1 + square.height/1.2))
                             
                             var subtraction2 = new paper.Path()
                             subtraction2.add(
                                 //intersection[0].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[j].x*square.width/1.5,
-                                    rivers[i].surroundedFlaps[j].y *square.width/1.5 *-1 + square.height/1.5),
+                                    rivers[i].surroundedFlaps[j].x*square.width/1.2,
+                                    rivers[i].surroundedFlaps[j].y *square.width/1.2 *-1 + square.height/1.2),
                                 intersection[1].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[k].x*square.width/1.5,
-                                    rivers[i].surroundedFlaps[k].y *square.width/1.5 *-1 + square.height/1.5))  
+                                    rivers[i].surroundedFlaps[k].x*square.width/1.2,
+                                    rivers[i].surroundedFlaps[k].y *square.width/1.2 *-1 + square.height/1.2))  
                         }
 
                         //subtractions.push(subtraction)
                         if(intersection1){
                             intersections.push(chunk1.intersect(subtraction1))
-                            subtractions.push(subtraction1,subtraction2)
+                            subtractions.push(subtraction1)
                         }
                         if(intersection2){
                             intersections.push(chunk2.intersect(subtraction2))
-                            subtractions.push(subtraction2,subtraction1)
+                            subtractions.push(subtraction2)
                         }
                     }
                 }
@@ -157,10 +158,10 @@
         function drawCircles(){
             for (var i=0;i<flaps.length;i++){
                 circle = new paper.Path.Circle(new paper.Point(
-                    flaps[i].x *square.width/1.5,
-                    flaps[i].y *square.width/1.5 *-1 + square.height/1.5
+                    flaps[i].x *square.width/1.2,
+                    flaps[i].y *square.width/1.2 *-1 + square.height/1.2
                     ), 
-                    flaps[i].r*square.width/1.5);
+                    flaps[i].r*square.width/1.2);
                 circle.strokeColor = "black";
                 circle.fillColor = "#C5FBA8"
                 circle.strokeWidth = 1;
@@ -174,21 +175,21 @@
                 if (paths[i].isActive){
                     path = new paper.Path.Line(
                     new paper.Point(
-                            paths[i].node1.x *square.width/1.5,
-                            paths[i].node1.y *square.width/1.5 *-1 + square.height/1.5),
+                            paths[i].node1.x *square.width/1.2,
+                            paths[i].node1.y *square.width/1.2 *-1 + square.height/1.2),
                     new paper.Point(
-                            paths[i].node2.x *square.width/1.5,
-                            paths[i].node2.y *square.width/1.5 *-1 + square.height/1.5));
+                            paths[i].node2.x *square.width/1.2,
+                            paths[i].node2.y *square.width/1.2 *-1 + square.height/1.2));
                     path.strokeColor = 'lime';
                     lines.push(path);
                 } else if (paths[i].isInvalid){
                     path = new paper.Path.Line(
                     new paper.Point(
-                            paths[i].node1.x *square.width/1.5,
-                            paths[i].node1.y *square.width/1.5 *-1 + square.height/1.5),
+                            paths[i].node1.x *square.width/1.2,
+                            paths[i].node1.y *square.width/1.2 *-1 + square.height/1.2),
                     new paper.Point(
-                            paths[i].node2.x *square.width/1.5,
-                            paths[i].node2.y *square.width/1.5 *-1 + square.height/1.5));
+                            paths[i].node2.x *square.width/1.2,
+                            paths[i].node2.y *square.width/1.2 *-1 + square.height/1.2));
                     path.strokeColor = 'red';
                     lines.push(path);
                 }
