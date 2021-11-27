@@ -53,10 +53,10 @@
 
                     tempCircles.push(new paper.Path.Circle({
                         center: new paper.Point(
-                            rivers[i].surroundedFlaps[j].x *square.width/1.2,
-                            rivers[i].surroundedFlaps[j].y *square.width/1.2 *-1 + square.height/1.2),
+                            rivers[i].surroundedFlaps[j].x *500,
+                            rivers[i].surroundedFlaps[j].y *500 *-1 + 500),
                         //radius: (rivers[i].surroundedFlaps[j].r + rivers[i].r) *square.width/1.2
-                        radius: (findTreeDistance(rivers[i].surroundedFlaps[j],rivers[i].innerNode) + rivers[i].r) *square.width/1.2
+                        radius: (findTreeDistance(rivers[i].surroundedFlaps[j],rivers[i].innerNode) + rivers[i].r) *500
                     }))
                 }//find all the circles in the outer path
                 //==================
@@ -74,27 +74,27 @@
                         /////////
                         chunk1 = new paper.Path.Circle({
                             center: intersection[0].point,
-                            radius: rivers[i].r*square.width/1.2
+                            radius: rivers[i].r*500
                         })
                         chunk2 = new paper.Path.Circle({
                             center: intersection[1].point,
-                            radius: rivers[i].r*square.width/1.2
+                            radius: rivers[i].r*500
                         })  
                         for(var l = 0; l<rivers[i].surroundedFlaps.length; l++){
                             //iterating through all surrounded flaps to see if the intersection is internal
                             if(intersection1 && intersection[0].point.getDistance(new paper.Point(
-                                rivers[i].surroundedFlaps[l].x*square.width/1.2,
-                                rivers[i].surroundedFlaps[l].y *square.width/1.2 *-1 + square.height/1.2)
+                                rivers[i].surroundedFlaps[l].x*500,
+                                rivers[i].surroundedFlaps[l].y *500 *-1 + 500)
                                 ) <
-                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*square.width/1.2 + 0.000001
+                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*500 + 0.000001
                             ){
                                 intersection1 = false;
                             }
                             if(intersection2 && intersection[1].point.getDistance(new paper.Point(
-                                rivers[i].surroundedFlaps[l].x*square.width/1.2,
-                                rivers[i].surroundedFlaps[l].y *square.width/1.2 *-1 + square.height/1.2)
+                                rivers[i].surroundedFlaps[l].x*500,
+                                rivers[i].surroundedFlaps[l].y *-500+500)//*square.width/1.2 *-1 + square.height/1.2)
                                 ) <
-                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*square.width/1.2 + 0.000001
+                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*500 + 0.000001
                             ){
                                 intersection2 = false;
                             }
@@ -105,23 +105,23 @@
                             subtraction1.add(
                                 intersection[0].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[j].x*square.width/1.2,
-                                    rivers[i].surroundedFlaps[j].y *square.width/1.2 *-1 + square.height/1.2),
+                                    rivers[i].surroundedFlaps[j].x*500,
+                                    rivers[i].surroundedFlaps[j].y *500 *-1 + 500),
                                 //intersection[1].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[k].x*square.width/1.2,
-                                    rivers[i].surroundedFlaps[k].y *square.width/1.2 *-1 + square.height/1.2))
+                                    rivers[i].surroundedFlaps[k].x*500,
+                                    rivers[i].surroundedFlaps[k].y *500 *-1 + 500))
                             
                             var subtraction2 = new paper.Path()
                             subtraction2.add(
                                 //intersection[0].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[j].x*square.width/1.2,
-                                    rivers[i].surroundedFlaps[j].y *square.width/1.2 *-1 + square.height/1.2),
+                                    rivers[i].surroundedFlaps[j].x*500,
+                                    rivers[i].surroundedFlaps[j].y *500 *-1 + 500),
                                 intersection[1].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[k].x*square.width/1.2,
-                                    rivers[i].surroundedFlaps[k].y *square.width/1.2 *-1 + square.height/1.2))  
+                                    rivers[i].surroundedFlaps[k].x*500,
+                                    rivers[i].surroundedFlaps[k].y *500 *-1 + 500))  
                         }
 
                         //subtractions.push(subtraction)
@@ -158,10 +158,10 @@
         function drawCircles(){
             for (var i=0;i<flaps.length;i++){
                 circle = new paper.Path.Circle(new paper.Point(
-                    flaps[i].x *square.width/1.2,
-                    flaps[i].y *square.width/1.2 *-1 + square.height/1.2
+                    flaps[i].x *500,
+                    flaps[i].y *500 *-1 + 500
                     ), 
-                    flaps[i].r*square.width/1.2);
+                    flaps[i].r*500);
                 circle.strokeColor = "black";
                 circle.fillColor = "#C5FBA8"
                 circle.strokeWidth = 1;
@@ -175,21 +175,21 @@
                 if (paths[i].isActive){
                     path = new paper.Path.Line(
                     new paper.Point(
-                            paths[i].node1.x *square.width/1.2,
-                            paths[i].node1.y *square.width/1.2 *-1 + square.height/1.2),
+                            paths[i].node1.x *500,
+                            paths[i].node1.y *500 *-1 + 500),
                     new paper.Point(
-                            paths[i].node2.x *square.width/1.2,
-                            paths[i].node2.y *square.width/1.2 *-1 + square.height/1.2));
+                            paths[i].node2.x *500,
+                            paths[i].node2.y *500 *-1 + 500));
                     path.strokeColor = 'lime';
                     lines.push(path);
                 } else if (paths[i].isInvalid){
                     path = new paper.Path.Line(
                     new paper.Point(
-                            paths[i].node1.x *square.width/1.2,
-                            paths[i].node1.y *square.width/1.2 *-1 + square.height/1.2),
+                            paths[i].node1.x *500,
+                            paths[i].node1.y *500 *-1 + 500),
                     new paper.Point(
-                            paths[i].node2.x *square.width/1.2,
-                            paths[i].node2.y *square.width/1.2 *-1 + square.height/1.2));
+                            paths[i].node2.x *500,
+                            paths[i].node2.y *500 *-1 + 500));
                     path.strokeColor = 'red';
                     lines.push(path);
                 }
@@ -214,7 +214,7 @@
         var selected = new paper.Point(0,0)
         paper.view.onMouseDown = function(event) {
             for (var i = 0; i<flaps.length; i++){
-                if(event.point.getDistance(flaps[i])<flaps[i].r*500){
+                if(event.point.getDistance(new paper.Point(flaps[i].x*500,-flaps[i].y*500))<flaps[i].r*500){
                     selected = flaps[i]
                     console.log(selected)
                     return
@@ -222,14 +222,8 @@
             }
         }
         paper.view.onMouseDrag = function(event){
-            selected.x =event.point.x
-            selected.y += event.delta.y
-            if (selected.x>500){
-                selected.x -= selected.x-500
-            }
-            if (selected.y>500){
-                selected.y -= selected.y-500
-            }
+            selected.x +=event.delta.x/500
+            selected.y -=event.delta.y/500
         }
         paper.view.draw();
 
