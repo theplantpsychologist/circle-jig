@@ -183,6 +183,12 @@
                     path.strokeColor = 'lime';
                     lines.push(path);
                 } else if (paths[i].isInvalid){
+                    overlap = paths[i].overlap*500
+                    paths[i].node1.x += overlap*(paths[i].node1.x - paths[i].node2.x)*0.001
+                    paths[i].node1.y += overlap*(paths[i].node1.y - paths[i].node2.y)*0.001
+                    paths[i].node2.x += overlap*(paths[i].node2.x - paths[i].node1.x)*0.001
+                    paths[i].node2.y += overlap*(paths[i].node2.y - paths[i].node1.y)*0.001
+
                     path = new paper.Path.Line(
                     new paper.Point(
                             paths[i].node1.x *500,
@@ -210,13 +216,29 @@
             border.remove()
             drawBorder();
             drawPaths();
+            for (var i = 0; i<flaps.length; i++){
+                if (flaps[i].x>1){
+                    flaps[i].x -= flaps[i].x-1
+                }
+                if (flaps[i].y>1){
+                    flaps[i].y -= flaps[i].y-1
+                }
+                if (flaps[i].x<0){
+                    flaps[i].x -= flaps[i].x-0
+                }
+                if (flaps[i].y<0){
+                    flaps[i].y -= flaps[i].y-0
+                }
+            }
+
+            //the invalid paths push constraint will be in drawPaths()
         }
         var selected = new paper.Point(0,0)
         paper.view.onMouseDown = function(event) {
             for (var i = 0; i<flaps.length; i++){
-                if(event.point.getDistance(new paper.Point(flaps[i].x*500,-flaps[i].y*500))<flaps[i].r*500){
+                if(event.point.getDistance(new paper.Point(flaps[i].x*500,flaps[i].y*-500+500))<flaps[i].r*500){
                     selected = flaps[i]
-                    console.log(selected)
+                    //console.log(selected)
                     return
                 }
             }

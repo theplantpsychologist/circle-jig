@@ -178,7 +178,8 @@ class Path {
 	node2: TreeNode;
 	isActive: Boolean;
 	isInvalid: Boolean;
-	cpDistance: Number
+	cpDistance: Number;
+	overlap: Number;
 	constructor(node1,node2){
 		this.node1 = node1
 		this.node2 = node2
@@ -192,6 +193,7 @@ class Path {
 		} else if (findTreeDistance(node1,node2) > ((node1.x-node2.x)**2 + (node1.y-node2.y)**2)**0.5 + 0.0005){
 			this.isInvalid = true;
 			this.isActive = false;
+			this.overlap = findTreeDistance(node1,node2)-((node1.x-node2.x)**2 + (node1.y-node2.y)**2)**0.5
 		} else {
 			this.isActive = false;
 			this.isInvalid = false;

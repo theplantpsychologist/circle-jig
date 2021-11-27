@@ -192,6 +192,7 @@ function () {
     } else if (findTreeDistance(node1, node2) > Math.pow(Math.pow(node1.x - node2.x, 2) + Math.pow(node1.y - node2.y, 2), 0.5) + 0.0005) {
       this.isInvalid = true;
       this.isActive = false;
+      this.overlap = findTreeDistance(node1, node2) - Math.pow(Math.pow(node1.x - node2.x, 2) + Math.pow(node1.y - node2.y, 2), 0.5);
     } else {
       this.isActive = false;
       this.isInvalid = false;
