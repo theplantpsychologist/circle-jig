@@ -1,0 +1,51 @@
+body {
+    background-color: #FFFBF1;
+    color: #343633;
+}
+#title {
+    position:relative; 
+    left: 190px;
+    font-family: "Century Gothic";
+}
+p {
+    font-family: "Century Gothic";
+}
+li {
+    font-family: "Century Gothic";
+}
+#instructions{
+    position:relative; 
+    left: 520px;
+}
+#square{
+    position:relative;
+    top: -170px;
+    left: 10px;
+}
+#checkboxes{
+    position:relative;
+    left:520px;
+    top:-500px;
+    font-family: "Century Gothic";
+}
+#import{
+    position:relative;
+    left:520px;
+    top:-500px;
+}
+#inputfile{
+    position:relative;
+    left:520px;
+    top:-500px;
+}
+#upload{
+    position:relative;
+    left:520px;
+    top:-500px;
+}
+#credits{
+
+    position:relative;
+    left: 10px;
+    top:-300px;
+}

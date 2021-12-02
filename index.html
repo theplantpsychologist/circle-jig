@@ -5,23 +5,35 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Circle Jig</title>
-    <!---<link rel="stylesheet" href="main.css">--->
+    <link href="main - Copy.css" rel="stylesheet" type="text/css" >
 
 </head>
 <body>
-    <h2>Circle Jig</h2>
-    <p>Instructions</p>
+    <h1 id="title">Circle Jig</h2>
+    <div id = instructions>
+        <p>Instructions:</p>
+        <ul>
+            <li>Below, import a .tmd5 file from <a href="https://www.langorigami.com/article/treemaker"> Treemaker</a></li>
+            <li>Click and drag the circles around</li>
+            <li>If there isn't enough room for the circles, <br>
+                you can let the square expand to make room</li>
+            <li>If you want to find a more optimal packing, <br>
+                you can let the square shrink until it can't shrink further</li>
+        </ul>
+    </div>
     <canvas id = "square" width = 500 height = 500>    </canvas>
     <script src="paper-core.js"></script>
     <script src="app2.js"></script>
-    <div>
+
+    <div id= "checkboxes">
         <input type="checkbox" id="shrink">
         <label for="shrink">Let the square tighten</label>
-    </div>
-    <div>
+        <br>
         <input type="checkbox" id="grow">
         <label for="grow">Let the square expand</label>
     </div>
+
+
     <script type="text/javascript" data-paper-ignore = "true">
         paper.setup(document.getElementById("square"));
         squareSize = 500
@@ -145,7 +157,7 @@
                     rivers[i].outerPath = rivers[i].outerPath.unite(intersections[j])
                 }
                 try{
-                    rivers[i].outerPath.fillColor = "cyan"
+                    rivers[i].outerPath.fillColor = "#77D6EE"
                     rivers[i].outerPath.strokeColor = "black"
                 }catch{
                     0
@@ -163,7 +175,7 @@
                     ), 
                     flaps[i].r*squareSize);
                 circle.strokeColor = "black";
-                circle.fillColor = "#C5FBA8"
+                circle.fillColor = "#F0E168"
                 circle.strokeWidth = 1;
                 circles.push(circle);
             }
@@ -182,6 +194,7 @@
                             paths[i].node2.x *squareSize,
                             paths[i].node2.y *squareSize *-1 + 500));
                     path.strokeColor = 'lime';
+                    path.strokeWidth = 2;
                     lines.push(path);
                 } else if (paths[i].isInvalid){
                     overlap = paths[i].overlap*squareSize
@@ -198,6 +211,7 @@
                             paths[i].node2.x *squareSize,
                             paths[i].node2.y *squareSize *-1 + 500));
                     path.strokeColor = 'red';
+                    path.strokeWidth = 2;
                     lines.push(path);
                     invalidPathsPresent = true
                 }
@@ -260,8 +274,10 @@
         
 
     </script>
+
+
     <noscript>Please enable javascript to use this app.</noscript>
-    <p>Import your .tmd5 (treemaker) file here:</p>
+    <p id="import">Import your .tmd5 (treemaker) file below:</p>
     <input type="file" id="inputfile" name = "inputfile">
     <pre id="output"></pre>
     <script>
@@ -269,8 +285,10 @@
         squareSize = 500
 
     </script>
-    <button type = button onclick="extract()">Upload</button>  
-    <p>This tool was created by Brandon Wong</p>
-    <a href="https://github.com/theplantpsychologist/circle-jig"> Github repository</a>  
+    <button id = "upload" type = button onclick="extract()">Upload</button>  
+    <div id="credits">
+        <p>This tool was created by Brandon Wong</p>
+        <a href="https://github.com/theplantpsychologist/circle-jig"> Github repository</a>  
+    </div>
 </body>
 </html>
