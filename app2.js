@@ -10,6 +10,7 @@ var rivers;
 var nodes;
 var edges;
 var paths;
+var squareSize;
 function fileRead() {
     document.getElementById('inputfile')
         .addEventListener('change', function () {
@@ -45,6 +46,7 @@ function extract() {
     for (var i = 0; i < rivers.length; i++) {
         decideInnerFindSurrounded(rivers[i]);
     }
+    squareSize = 500;
 }
 //initializes by storing stuff into lists
 //by the end of this, all the nodes should have their parents 
@@ -150,11 +152,11 @@ var Path = /** @class */ (function () {
     }
     Path.prototype.check = function (node1, node2) {
         this.cpDistance = Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5);
-        if (Math.abs(findTreeDistance(node1, node2) - Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5)) < 0.0005) {
+        if (Math.abs(findTreeDistance(node1, node2) - Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5)) < 0.001) {
             this.isActive = true;
             this.isInvalid = false;
         }
-        else if (findTreeDistance(node1, node2) > Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5) + 0.0005) {
+        else if (findTreeDistance(node1, node2) > Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5) + 0.001) {
             this.isInvalid = true;
             this.isActive = false;
             this.overlap = findTreeDistance(node1, node2) - Math.pow((Math.pow((node1.x - node2.x), 2) + Math.pow((node1.y - node2.y), 2)), 0.5);

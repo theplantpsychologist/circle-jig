@@ -14,21 +14,20 @@
     <canvas id = "square" width = 500 height = 500>    </canvas>
     <script src="paper-core.js"></script>
     <script src="app2.js"></script>
+    <div>
+        <input type="checkbox" id="shrink">
+        <label for="shrink">Let the square tighten</label>
+    </div>
+    <div>
+        <input type="checkbox" id="grow">
+        <label for="grow">Let the square expand</label>
+    </div>
     <script type="text/javascript" data-paper-ignore = "true">
         paper.setup(document.getElementById("square"));
-/*
-        point1 = new paper.Point(50,50);
-        point2 = new paper.Point(200,450);
-        point3 = new paper.Point(450,100);
-        path1 = new paper.Path.Arc(point1,point2,point3);
-        var riverStyle = {
-            strokeColor: "#A8F5FB",
-            //strokeJoin: "round"
-        }
-        path1.style = riverStyle;
-        path1.strokeWidth = 20
-*/
-
+        squareSize = 500
+        invalidPathsPresent = true
+        var allowShrinkSquare = document.querySelector('input[id="shrink"]');
+        var allowGrowSquare = document.querySelector('input[id="grow"]')
         circles = []; //the flaps drawn
         lines = []; //the paths drawn
         flaps = []; //an initial empty, once you extract from .tmd5, it will be replaced
@@ -53,10 +52,10 @@
 
                     tempCircles.push(new paper.Path.Circle({
                         center: new paper.Point(
-                            rivers[i].surroundedFlaps[j].x *500,
-                            rivers[i].surroundedFlaps[j].y *500 *-1 + 500),
+                            rivers[i].surroundedFlaps[j].x *squareSize,
+                            rivers[i].surroundedFlaps[j].y *squareSize *-1 + 500),
                         //radius: (rivers[i].surroundedFlaps[j].r + rivers[i].r) *square.width/1.2
-                        radius: (findTreeDistance(rivers[i].surroundedFlaps[j],rivers[i].innerNode) + rivers[i].r) *500
+                        radius: (findTreeDistance(rivers[i].surroundedFlaps[j],rivers[i].innerNode) + rivers[i].r) *squareSize
                     }))
                 }//find all the circles in the outer path
                 //==================
@@ -74,27 +73,27 @@
                         /////////
                         chunk1 = new paper.Path.Circle({
                             center: intersection[0].point,
-                            radius: rivers[i].r*500
+                            radius: rivers[i].r*squareSize
                         })
                         chunk2 = new paper.Path.Circle({
                             center: intersection[1].point,
-                            radius: rivers[i].r*500
+                            radius: rivers[i].r*squareSize
                         })  
                         for(var l = 0; l<rivers[i].surroundedFlaps.length; l++){
                             //iterating through all surrounded flaps to see if the intersection is internal
                             if(intersection1 && intersection[0].point.getDistance(new paper.Point(
-                                rivers[i].surroundedFlaps[l].x*500,
-                                rivers[i].surroundedFlaps[l].y *500 *-1 + 500)
+                                rivers[i].surroundedFlaps[l].x*squareSize,
+                                rivers[i].surroundedFlaps[l].y *squareSize *-1 + 500)
                                 ) <
-                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*500 + 0.000001
+                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*squareSize + 0.000001
                             ){
                                 intersection1 = false;
                             }
                             if(intersection2 && intersection[1].point.getDistance(new paper.Point(
-                                rivers[i].surroundedFlaps[l].x*500,
-                                rivers[i].surroundedFlaps[l].y *-500+500)//*square.width/1.2 *-1 + square.height/1.2)
+                                rivers[i].surroundedFlaps[l].x*squareSize,
+                                rivers[i].surroundedFlaps[l].y *-squareSize+500)//*square.width/1.2 *-1 + square.height/1.2)
                                 ) <
-                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*500 + 0.000001
+                                findTreeDistance(rivers[i].surroundedFlaps[l],rivers[i].outerNode)*squareSize + 0.000001
                             ){
                                 intersection2 = false;
                             }
@@ -105,23 +104,23 @@
                             subtraction1.add(
                                 intersection[0].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[j].x*500,
-                                    rivers[i].surroundedFlaps[j].y *500 *-1 + 500),
+                                    rivers[i].surroundedFlaps[j].x*squareSize,
+                                    rivers[i].surroundedFlaps[j].y *squareSize *-1 + 500),
                                 //intersection[1].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[k].x*500,
-                                    rivers[i].surroundedFlaps[k].y *500 *-1 + 500))
+                                    rivers[i].surroundedFlaps[k].x*squareSize,
+                                    rivers[i].surroundedFlaps[k].y *squareSize *-1 + 500))
                             
                             var subtraction2 = new paper.Path()
                             subtraction2.add(
                                 //intersection[0].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[j].x*500,
-                                    rivers[i].surroundedFlaps[j].y *500 *-1 + 500),
+                                    rivers[i].surroundedFlaps[j].x*squareSize,
+                                    rivers[i].surroundedFlaps[j].y *squareSize *-1 + 500),
                                 intersection[1].point,
                                 new paper.Point(
-                                    rivers[i].surroundedFlaps[k].x*500,
-                                    rivers[i].surroundedFlaps[k].y *500 *-1 + 500))  
+                                    rivers[i].surroundedFlaps[k].x*squareSize,
+                                    rivers[i].surroundedFlaps[k].y *squareSize *-1 + 500))  
                         }
 
                         //subtractions.push(subtraction)
@@ -157,11 +156,12 @@
         calculateRivers()
         function drawCircles(){
             for (var i=0;i<flaps.length;i++){
-                circle = new paper.Path.Circle(new paper.Point(
-                    flaps[i].x *500,
-                    flaps[i].y *500 *-1 + 500
+                circle = new paper.Path.Circle(
+                    new paper.Point(
+                        flaps[i].x *squareSize,
+                        flaps[i].y *squareSize *-1 + 500
                     ), 
-                    flaps[i].r*500);
+                    flaps[i].r*squareSize);
                 circle.strokeColor = "black";
                 circle.fillColor = "#C5FBA8"
                 circle.strokeWidth = 1;
@@ -170,34 +170,36 @@
         }
         drawCircles(); //should also draw the centers of the circles
         function drawPaths(){
+            invalidPathsPresent = false
             for (var i=0;i<paths.length;i++){
                 paths[i].check(paths[i].node1,paths[i].node2);
                 if (paths[i].isActive){
                     path = new paper.Path.Line(
                     new paper.Point(
-                            paths[i].node1.x *500,
-                            paths[i].node1.y *500 *-1 + 500),
+                            paths[i].node1.x *squareSize,
+                            paths[i].node1.y *squareSize *-1 + 500),
                     new paper.Point(
-                            paths[i].node2.x *500,
-                            paths[i].node2.y *500 *-1 + 500));
+                            paths[i].node2.x *squareSize,
+                            paths[i].node2.y *squareSize *-1 + 500));
                     path.strokeColor = 'lime';
                     lines.push(path);
                 } else if (paths[i].isInvalid){
-                    overlap = paths[i].overlap*500
-                    paths[i].node1.x += overlap*(paths[i].node1.x - paths[i].node2.x)*0.001
-                    paths[i].node1.y += overlap*(paths[i].node1.y - paths[i].node2.y)*0.001
-                    paths[i].node2.x += overlap*(paths[i].node2.x - paths[i].node1.x)*0.001
-                    paths[i].node2.y += overlap*(paths[i].node2.y - paths[i].node1.y)*0.001
+                    overlap = paths[i].overlap*squareSize
+                    paths[i].node1.x += overlap*(paths[i].node1.x - paths[i].node2.x)*0.005
+                    paths[i].node1.y += overlap*(paths[i].node1.y - paths[i].node2.y)*0.005
+                    paths[i].node2.x += overlap*(paths[i].node2.x - paths[i].node1.x)*0.005
+                    paths[i].node2.y += overlap*(paths[i].node2.y - paths[i].node1.y)*0.005
 
                     path = new paper.Path.Line(
                     new paper.Point(
-                            paths[i].node1.x *500,
-                            paths[i].node1.y *500 *-1 + 500),
+                            paths[i].node1.x *squareSize,
+                            paths[i].node1.y *squareSize *-1 + 500),
                     new paper.Point(
-                            paths[i].node2.x *500,
-                            paths[i].node2.y *500 *-1 + 500));
+                            paths[i].node2.x *squareSize,
+                            paths[i].node2.y *squareSize *-1 + 500));
                     path.strokeColor = 'red';
                     lines.push(path);
+                    invalidPathsPresent = true
                 }
             }
         }
@@ -217,18 +219,23 @@
             drawBorder();
             drawPaths();
             for (var i = 0; i<flaps.length; i++){
-                if (flaps[i].x>1){
-                    flaps[i].x -= flaps[i].x-1
+                if (flaps[i].x*squareSize>500){
+                    flaps[i].x -= (flaps[i].x*squareSize-500)/squareSize //if you go above 500px, go back down to 500
                 }
-                if (flaps[i].y>1){
-                    flaps[i].y -= flaps[i].y-1
+                if (flaps[i].y*squareSize>500){
+                    flaps[i].y -= (flaps[i].y*squareSize-500)/squareSize
                 }
                 if (flaps[i].x<0){
-                    flaps[i].x -= flaps[i].x-0
+                    flaps[i].x += -flaps[i].x //if you go below 0, get pushed back up to 0
                 }
                 if (flaps[i].y<0){
-                    flaps[i].y -= flaps[i].y-0
+                    flaps[i].y += -flaps[i].y
                 }
+            }//keep flaps in the square
+            if(invalidPathsPresent&&allowGrowSquare.checked){
+                squareSize *= 0.998 //shrinking this value will increase the square
+            } else if(!invalidPathsPresent&&allowShrinkSquare.checked){
+                squareSize*=1.005
             }
 
             //the invalid paths push constraint will be in drawPaths()
@@ -236,7 +243,7 @@
         var selected = new paper.Point(0,0)
         paper.view.onMouseDown = function(event) {
             for (var i = 0; i<flaps.length; i++){
-                if(event.point.getDistance(new paper.Point(flaps[i].x*500,flaps[i].y*-500+500))<flaps[i].r*500){
+                if(event.point.getDistance(new paper.Point(flaps[i].x*squareSize,flaps[i].y*-squareSize+500))<flaps[i].r*squareSize){
                     selected = flaps[i]
                     //console.log(selected)
                     return
@@ -244,10 +251,13 @@
             }
         }
         paper.view.onMouseDrag = function(event){
-            selected.x +=event.delta.x/500
-            selected.y -=event.delta.y/500
+            selected.x +=event.delta.x/squareSize
+            selected.y -=event.delta.y/squareSize
         }
         paper.view.draw();
+
+        
+        
 
     </script>
     <noscript>Please enable javascript to use this app.</noscript>
@@ -256,6 +266,8 @@
     <pre id="output"></pre>
     <script>
         fileRead();
+        squareSize = 500
+
     </script>
     <button type = button onclick="extract()">Upload</button>  
     <p>This tool was created by Brandon Wong</p>
