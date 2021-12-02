@@ -11,6 +11,7 @@ var nodes;
 var edges;
 var paths;
 var squareSize;
+var scale;
 
 function fileRead() {
   document.getElementById('inputfile').addEventListener('change', function () {

@@ -251,6 +251,14 @@
             } else if(!invalidPathsPresent&&allowShrinkSquare.checked){
                 squareSize*=1.005
             }
+            var text = new paper.PointText({
+                point: [10,490],
+                content: 'Scale: '+(parseFloat(scale)*squareSize/500).toString() ,
+                fillColor: 'black',
+                fontFamily: 'Century Gothic',
+                fontWeight: 'bold',
+                fontSize: 15
+            });
 
             //the invalid paths push constraint will be in drawPaths()
         }
