@@ -19,6 +19,7 @@ How the Circle Jig works
 -River construction: let's just say it's complicated
 
 ================
+
 Features for future updates:
 -Importing bp studio files in addition to treemaker files
 
@@ -31,6 +32,7 @@ Features for future updates:
 -Increased efficiency for high complexity files
 
 ================
+
 Known issues:
 -Sometimes flaps within a river will have undesired blue space between them
 
