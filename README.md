@@ -8,6 +8,7 @@ Instructions:
 4. To fix invalid paths, select the option that says "Let the square expand"
 
 How the Circle Jig works
+
 -When two flaps form an invalid path, they are both moved in opposite directions an incremental distance proportional to the amount they were overlapping
 
 -When a flap is pushed off the edge, it is immediately placed back into the square, forcing whatever flap that pushed it out in the first place to readjust instead
@@ -21,6 +22,7 @@ How the Circle Jig works
 ================
 
 Features for future updates:
+
 -Importing bp studio files in addition to treemaker files
 
 -Exporting as bp studio or treemaker files
@@ -34,6 +36,7 @@ Features for future updates:
 ================
 
 Known issues:
+
 -Sometimes flaps within a river will have undesired blue space between them
 
 -Flaps do not move smoothly when pushed by multiple directions
