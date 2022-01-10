@@ -13,10 +13,13 @@
     <div id = instructions>
         <p>Instructions:</p>
         <ul>
-            <li>Below, import a .tmd5 file from <a href="https://www.langorigami.com/article/treemaker"> Treemaker</a></li>
+            <li>Below, import a .tmd5 file from <a href="https://www.langorigami.com/article/treemaker"> Treemaker</a>
+            <br>If you don't have one but you want to try out this tool, 
+            <br> you can download and reupload <a href="./simple example.tmd5" download="example">this one</a></li>
             <li>Click and drag the circles around</li>
             <li>If you want to find a more tight (optimal) packing, <br>
-                you can let the square shrink until it can't shrink further</li>
+                you can let the square shrink until it can't shrink further <br>
+                (You want the scale number to be as large as possible)</li>
             <li>If you have a lot of invalid (red) paths, <br>
                 you can let the square expand to make more room</li>
         </ul>
@@ -198,10 +201,18 @@
                     lines.push(path);
                 } else if (paths[i].isInvalid){
                     overlap = paths[i].overlap*squareSize
-                    paths[i].node1.x += overlap*(paths[i].node1.x - paths[i].node2.x)*0.005
-                    paths[i].node1.y += overlap*(paths[i].node1.y - paths[i].node2.y)*0.005
-                    paths[i].node2.x += overlap*(paths[i].node2.x - paths[i].node1.x)*0.005
-                    paths[i].node2.y += overlap*(paths[i].node2.y - paths[i].node1.y)*0.005
+                    if (paths[i].node1.x>0 && paths[i].node1.x<1){
+                        paths[i].node1.x += overlap*(paths[i].node1.x - paths[i].node2.x)*0.005
+                    }
+                    if (paths[i].node1.y>0 && paths[i].node1.y<1){
+                        paths[i].node1.y += overlap*(paths[i].node1.y - paths[i].node2.y)*0.005
+                    }
+                    if (paths[i].node2.x>0 && paths[i].node2.x<1){
+                        paths[i].node2.x += overlap*(paths[i].node2.x - paths[i].node1.x)*0.005
+                    }
+                    if (paths[i].node2.y>0 && paths[i].node2.y<1){
+                        paths[i].node2.y += overlap*(paths[i].node2.y - paths[i].node1.y)*0.005
+                    }
 
                     path = new paper.Path.Line(
                     new paper.Point(
@@ -278,15 +289,13 @@
         }
         paper.view.draw();
 
-        
-        
 
     </script>
 
 
     <noscript>Please enable javascript to use this app.</noscript>
-    <p id="import">Import your .tmd5 (treemaker) file below:</p>
-    <input type="file" id="inputfile" name = "inputfile">
+    <p id="import"> Import your .tmd5 (treemaker) file below:</p>
+    <input type="file" id="inputfile" name = "inputfile" value="./simple example.tmd5">
     <pre id="output"></pre>
     <script>
         fileRead();
