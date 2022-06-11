@@ -1,39 +1,50 @@
 "use strict";
 //exports.__esModule = true;
 //'use strict'
+const DEFAULT_SQUARE_SIZE = 500;
+const DEFAULT_SCALE = 0.1;
+
 var square = document.getElementById("square");
 var ooga = "booga";
 var tmd5;
-var scale;
+var scale = DEFAULT_SCALE;
 var flaps;
 var rivers;
 var nodes;
 var edges;
 var paths;
-var squareSize;
+var squareSize = DEFAULT_SQUARE_SIZE;
 var scale;
-function fileRead() {
-    document.getElementById('inputfile')
-        .addEventListener('change', function () {
-        var fr = new FileReader();
-        fr.onload = function () {
-            document.getElementById('output');
-            //.textContent=fr.result;
-            tmd5 = fr.result.split("\n");
-            scale = tmd5[4];
-            //console.log(fr.result.split(' ')[0]);
-        };
-        fr.readAsText(this.files[0]);
-    });
+
+/**
+ * Callback when user submits an uploaded file which parses the file and displays it in the output.
+ */
+function fileSubmitCallback() {
+    const reader = new FileReader();
+    reader.onload = function () {
+        tmd5 = reader.result.split("\n");
+        processLines(tmd5);
+    };
+    const fileSelector = document.getElementById("inputfile");
+    if (fileSelector) {
+        reader.readAsText(fileSelector.files[0]);
+    } else {
+        console.log("File input element not present");
+    }
 }
-//reads the file 
-//creates a list tmd5 where each line is a new item in the list
-function extract() {
+
+/**
+ * Parse an input file and display it in the output.
+ *
+ * @param tmd5 an array of strings, where each string is a line in a TMD file read from top to bottom
+ */
+function processLines(tmd5) {
     flaps = []; //local definitions of flaps and rivers
     rivers = [];
     nodes = ['buffer']; //raw collected from treemaker
     edges = ['buffer']; //buffer because treemaker starts at 1, instead of 0
     paths = [];
+    scale = tmd5[4];
     collectNodes(tmd5);
     collectEdges(tmd5);
     collectFlaps(nodes);

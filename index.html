@@ -295,14 +295,13 @@
 
     <noscript>Please enable javascript to use this app.</noscript>
     <p id="import"> Import your .tmd5 (treemaker) file below:</p>
-    <input type="file" id="inputfile" name = "inputfile" value="./simple example.tmd5">
+    <input type="file" id="inputfile" name="inputfile" />
     <pre id="output"></pre>
     <script>
-        fileRead();
-        squareSize = 500
-
+            const exampleLocation = "./example.tmd5";
+            fetch(exampleLocation).then(resp => resp.text()).then(text => processLines(text.split("\n")));
     </script>
-    <button id = "upload" type = button onclick="extract()">Upload</button>  
+    <button id="upload" type=button onclick="fileSubmitCallback()">Upload</button>
     <div id="credits">
         <p>This tool was created by Brandon Wong</p>
         <a href="https://github.com/theplantpsychologist/circle-jig"> Github repository</a>  
